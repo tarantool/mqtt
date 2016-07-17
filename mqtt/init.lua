@@ -151,13 +151,14 @@ mqtt_mt = {
     -- Connect to an MQTT broker.
     --
     -- Parameters:
-    -- 	opts.host -      the hostname or ip address of the broker to connect to.
-    -- 	opts.port -      the network port to connect to. Usually 1883.
-    -- 	opts.keepalive - the number of seconds after which the broker should send a PING
-    --                   message to the client if no other messages have been exchanged
-    --                   in that time.
-    --  opts.log_mask  - LOG_NONE, LOG_INFO, LOG_NOTICE, LOG_WARNING,
-    --                   LOG_ERROR[default], LOG_DEBUG, LOG_ALL
+    -- 	opts.host          - the hostname or ip address of the broker to connect to.
+    -- 	opts.port          - the network port to connect to. Usually 1883.
+    -- 	opts.keepalive     - the number of seconds after which the broker should send a PING
+    --                       message to the client if no other messages have been exchanged
+    --                       in that time.
+    --  opts.log_mask      - LOG_NONE, LOG_INFO, LOG_NOTICE, LOG_WARNING,
+    --                       LOG_ERROR[default], LOG_DEBUG, LOG_ALL
+    --  opts.auto_reconect - true[default], false - auto reconnect on, off
     --
     -- Returns:
     --  true or false, emsg
@@ -197,6 +198,9 @@ mqtt_mt = {
     --  NOTE
     --    After reconnecting you must call<subscribe> for subscribing
     --    to a topics.
+    --
+    --  See
+    --    <connect> <opts.auto_reconect>
     --
     reconnect = function()
       return self.mqtt:reconnect()
@@ -253,8 +257,6 @@ mqtt_mt = {
     end,
 
     --
-    -- Function: mosquitto_will_set
-    --
     -- Configure will information for a mosquitto instance. By default, clients do
     -- not have a will.  This must be called before calling <connect>.
     --
@@ -273,7 +275,6 @@ mqtt_mt = {
     end,
 
     --
-    -- Function: mosquitto_will_clear
     --
     -- Remove a previously configured will. This must be called before calling
     -- <connect>.
