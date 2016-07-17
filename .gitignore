@@ -5,6 +5,7 @@
 *.so.*
 *.dylib
 
+tests/out
 build
 CMakeCache.txt
 CMakeFiles

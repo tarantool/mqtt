@@ -38,10 +38,12 @@
 #include <mosquitto.h>
 
 #ifndef TIMEOUT_INFINITY
-#  define TIMEOUT_INFINITY 365 * 86400 * 100.0
+#  define TIMEOUT_INFINITY ((size_t)-1)
 #endif /*TIMEOUT_INFINITY*/
 
-static inline int
+
+static inline
+int
 make_str_result(lua_State *L, bool ok, const char *str)
 {
 	lua_pushboolean(L, ok);
@@ -49,7 +51,8 @@ make_str_result(lua_State *L, bool ok, const char *str)
 	return 2;
 }
 
-static inline int
+static inline
+int
 make_int_result(lua_State *L, bool ok, int i)
 {
 	lua_pushboolean(L, ok);
@@ -57,15 +60,8 @@ make_int_result(lua_State *L, bool ok, int i)
 	return 2;
 }
 
-static inline int
-make_nil_result(lua_State *L, bool ok)
-{
-	lua_pushboolean(L, ok);
-	lua_pushnil(L);
-	return 2;
-}
-
-static inline int
+static inline
+int
 make_errorno_result(lua_State *L, int errno_, bool mosq_errno)
 {
 	lua_pushboolean(L, false);
@@ -77,12 +73,13 @@ make_errorno_result(lua_State *L, int errno_, bool mosq_errno)
 	return 2;
 }
 
-static inline int
+static inline
+int
 make_mosq_status_result(lua_State *L, int mosq_errno)
 {
 	switch (mosq_errno) {
 	case MOSQ_ERR_SUCCESS:
-		return make_nil_result(L, true);
+		return make_str_result(L, true, "ok");
 
 	case MOSQ_ERR_INVAL:
 	case MOSQ_ERR_NOMEM:
@@ -103,4 +100,4 @@ make_mosq_status_result(lua_State *L, int mosq_errno)
 	return make_str_result(L, false, "unknown status");
 }
 
-#endif
+#endif /* MOSQ_UTILS_H */

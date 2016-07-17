@@ -54,12 +54,50 @@ enum connect_return_codes {
 	CONN_REF_BAD_TLS
 };
 
-
 static bool mosq_initialized = false;
 
+static
+int
+mosq_poll_one_ctx(mosq_t *ctx, int revents, size_t timeout, int max_packets)
+{
+	/** XXX
+	 * I'm confused: socket < 0 means MOSQ_ERR_NO_CONN
+	 */
+	int rc = MOSQ_ERR_NO_CONN;
 
-/* handle mosquitto lib return codes */
-static int
+	int fd = mosquitto_socket(ctx->mosq);
+
+	if (fd >= 0) {
+
+		/** Wait until event
+		 */
+		revents = coio_wait(fd, revents, timeout);
+
+		if (revents != 0) {
+			if (revents & COIO_READ)
+				rc = mosquitto_loop_read(ctx->mosq, max_packets);
+			if (revents & COIO_WRITE)
+				rc = mosquitto_loop_write(ctx->mosq, max_packets);
+		}
+
+		/**
+		 * mosquitto_loop_miss
+		 * This function deals with handling PINGs and checking
+		 * whether messages need to be retried,
+		 * so should be called fairly _frequently_(!).
+		 * */
+		if (ctx->next_misc_timeout < fiber_time64()) {
+			rc = mosquitto_loop_misc(ctx->mosq);
+			ctx->next_misc_timeout = fiber_time64() + 1200;
+		}
+	}
+
+    return rc;
+}
+
+
+static
+int
 mosq_lib_version(lua_State *L)
 {
 	int major, minor, rev;
@@ -67,11 +105,12 @@ mosq_lib_version(lua_State *L)
 
 	mosquitto_lib_version(&major, &minor, &rev);
 	sprintf(version, "%i.%i.%i", major, minor, rev);
-	lua_pushstring(L, version);
-	return 1;
+
+	return make_str_result(L, true, version);
 }
 
-static int
+static
+int
 mosq_lib_init(lua_State *L)
 {
 	if (!mosq_initialized)
@@ -80,7 +119,8 @@ mosq_lib_init(lua_State *L)
 	return make_mosq_status_result(L, MOSQ_ERR_SUCCESS);
 }
 
-static int
+static
+int
 mosq_lib_cleanup(lua_State *L)
 {
 	mosquitto_lib_cleanup();
@@ -88,7 +128,8 @@ mosq_lib_cleanup(lua_State *L)
 	return make_mosq_status_result(L, MOSQ_ERR_SUCCESS);
 }
 
-static int
+static
+int
 mosq_new(lua_State *L)
 {
 	const char *id = luaL_optstring(L, 1, NULL);
@@ -121,7 +162,8 @@ mosq_new(lua_State *L)
 	return 1;
 }
 
-static int
+static
+int
 mosq_destroy(lua_State *L)
 {
 	mosq_t *ctx = mosq_get(L, 1);
@@ -135,7 +177,8 @@ mosq_destroy(lua_State *L)
 	return make_mosq_status_result(L, MOSQ_ERR_SUCCESS);
 }
 
-static int
+static
+int
 mosq_will_set(lua_State *L)
 {
 	mosq_t *ctx = mosq_get(L, 1);
@@ -157,7 +200,8 @@ mosq_will_set(lua_State *L)
 	return make_mosq_status_result(L, rc);
 }
 
-static int
+static
+int
 mosq_will_clear(lua_State *L)
 {
 	mosq_t *ctx = mosq_get(L, 1);
@@ -167,7 +211,8 @@ mosq_will_clear(lua_State *L)
 	return make_mosq_status_result(L, rc);
 }
 
-static int
+static
+int
 mosq_login_set(lua_State *L)
 {
 	mosq_t *ctx = mosq_get(L, 1);
@@ -179,7 +224,8 @@ mosq_login_set(lua_State *L)
 	return make_mosq_status_result(L, rc);
 }
 
-static int
+static
+int
 mosq_tls_set(lua_State *L)
 {
 	mosq_t *ctx = mosq_get(L, 1);
@@ -195,7 +241,8 @@ mosq_tls_set(lua_State *L)
 	return make_mosq_status_result(L, rc);
 }
 
-static int
+static
+int
 mosq_tls_insecure_set(lua_State *L)
 {
 	mosq_t *ctx = mosq_get(L, 1);
@@ -205,7 +252,8 @@ mosq_tls_insecure_set(lua_State *L)
 	return make_mosq_status_result(L, rc);
 }
 
-static int
+static
+int
 mosq_connect(lua_State *L)
 {
 	mosq_t *ctx = mosq_get(L, 1);
@@ -217,7 +265,8 @@ mosq_connect(lua_State *L)
 	return make_mosq_status_result(L, rc);
 }
 
-static int
+static
+int
 mosq_reconnect(lua_State *L)
 {
 	mosq_t *ctx = mosq_get(L, 1);
@@ -226,7 +275,8 @@ mosq_reconnect(lua_State *L)
 	return make_mosq_status_result(L, rc);
 }
 
-static int
+static
+int
 mosq_disconnect(lua_State *L)
 {
 	mosq_t *ctx = mosq_get(L, 1);
@@ -235,7 +285,8 @@ mosq_disconnect(lua_State *L)
 	return make_mosq_status_result(L, rc);
 }
 
-static int
+static
+int
 mosq_publish(lua_State *L)
 {
 	mosq_t *ctx = mosq_get(L, 1);
@@ -260,7 +311,8 @@ mosq_publish(lua_State *L)
 	return make_int_result(L, true, mid);
 }
 
-static int
+static
+int
 mosq_subscribe(lua_State *L)
 {
 	mosq_t *ctx = mosq_get(L, 1);
@@ -277,7 +329,8 @@ mosq_subscribe(lua_State *L)
 	return make_int_result(L, true, mid);
 }
 
-static int
+static
+int
 mosq_unsubscribe(lua_State *L)
 {
 	mosq_t *ctx = mosq_get(L, 1);
@@ -293,7 +346,8 @@ mosq_unsubscribe(lua_State *L)
 	return make_int_result(L, true, mid);
 }
 
-static void
+static
+void
 mosq_connect_f(
 	struct mosquitto *mosq,
 	void *obj,
@@ -305,7 +359,7 @@ mosq_connect_f(
 	enum connect_return_codes return_code = rc;
 
 	bool success = false;
-	char *str = "connection status unknown";
+	const char *str = "connection status unknown";
 
 	switch(return_code) {
 	case CONN_ACCEPT:
@@ -349,8 +403,8 @@ mosq_connect_f(
 	lua_call(ctx->L, 3, 0);
 }
 
-
-static void
+static
+void
 mosq_disconnect_f(
 	struct mosquitto *mosq,
 	void *obj,
@@ -376,8 +430,9 @@ mosq_disconnect_f(
 	lua_call(ctx->L, 3, 0);
 }
 
-static void
-mosq_on_publish(
+static
+void
+mosq_publish_f(
 	struct mosquitto *mosq,
 	void *obj,
 	int mid)
@@ -391,7 +446,8 @@ mosq_on_publish(
 	lua_call(ctx->L, 1, 0);
 }
 
-static void
+static
+void
 mosq_message_f(
 	struct mosquitto *mosq,
 	void *obj,
@@ -401,19 +457,22 @@ mosq_message_f(
 
 	mosq_t *ctx = obj;
 
-	/* push registered Lua callback function onto the stack */
 	lua_rawgeti(ctx->L, LUA_REGISTRYINDEX, ctx->message_ref);
-	/* push function args */
-	lua_pushinteger(ctx->L, msg->mid);
+
+    /**
+     * function F(mid, topic, payload, qos, retain)
+     */
+    lua_pushinteger(ctx->L, msg->mid);
 	lua_pushstring(ctx->L, msg->topic);
 	lua_pushlstring(ctx->L, msg->payload, msg->payloadlen);
 	lua_pushinteger(ctx->L, msg->qos);
 	lua_pushboolean(ctx->L, msg->retain);
 
-	lua_call(ctx->L, 5, 0); /* args: mid, topic, payload, qos, retain */
+	lua_call(ctx->L, 5, 0);
 }
 
-static void
+static
+void
 mosq_subscribe_f(
 	struct mosquitto *mosq,
 	void *obj,
@@ -435,7 +494,8 @@ mosq_subscribe_f(
 	lua_call(ctx->L, qos_count + 1, 0);
 }
 
-static void
+static
+void
 mosq_unsubscribe_f(
 	struct mosquitto *mosq,
 	void *obj,
@@ -450,7 +510,8 @@ mosq_unsubscribe_f(
 	lua_call(ctx->L, 1, 0);
 }
 
-static void
+static
+void
 mosq_log_f(
 	struct mosquitto *mosq,
 	void *obj,
@@ -471,12 +532,13 @@ mosq_log_f(
 	}
 }
 
-static int
+static
+int
 mosq_log_callback_set(lua_State *L)
 {
 	mosq_t *ctx = mosq_get(L, 1);
 
-	int log_level_mask = luaL_optinteger(L, 2, MOSQ_LOG_ALL);
+	int log_level_mask = luaL_optinteger(L, 2, MOSQ_LOG_ERR);
 
 	if (!lua_isfunction(L, 3)) {
 		return luaL_argerror(L, 3, "expecting a function");
@@ -491,7 +553,8 @@ mosq_log_callback_set(lua_State *L)
 }
 
 
-static int
+static
+int
 mosq_callback_set(lua_State *L)
 {
 	mosq_t *ctx = mosq_get(L, 1);
@@ -517,7 +580,7 @@ mosq_callback_set(lua_State *L)
 
 	case PUBLISH:
 		ctx->publish_ref = ref;
-		mosquitto_publish_callback_set(ctx->mosq, mosq_on_publish);
+		mosquitto_publish_callback_set(ctx->mosq, mosq_publish_f);
 		break;
 
 	case MESSAGE:
@@ -544,45 +607,17 @@ mosq_callback_set(lua_State *L)
 	return make_mosq_status_result(L, MOSQ_ERR_SUCCESS);
 }
 
-static int
+static
+int
 mosq_poll_one(lua_State *L)
 {
 	mosq_t *ctx = mosq_get(L, 1);
+
 	int revents = luaL_optinteger(L, 2, COIO_READ|COIO_WRITE);
-	int timeout = luaL_optinteger(L, 3, TIMEOUT_INFINITY);
-	int mosq_max_packets = luaL_optinteger(L, 4, 1);
+	size_t timeout = luaL_optinteger(L, 3, TIMEOUT_INFINITY);
+	int max_packets = luaL_optinteger(L, 4, 1);
 
-	/** XXX
-	 * I'm confused: socket < 0 means MOSQ_ERR_NO_CONN
-	 */
-	int rc = MOSQ_ERR_NO_CONN;
-
-	int fd = mosquitto_socket(ctx->mosq);
-
-	if (fd >= 0) {
-
-		/** Wait until event
-		 */
-		revents = coio_wait(fd, revents, timeout);
-
-		if (revents != 0) {
-			if (revents & COIO_READ)
-				rc = mosquitto_loop_read(ctx->mosq, mosq_max_packets);
-			if (revents & COIO_WRITE)
-				rc = mosquitto_loop_write(ctx->mosq, mosq_max_packets);
-		}
-
-		/**
-		 * mosquitto_loop_miss
-		 * This function deals with handling PINGs and checking
-		 * whether messages need to be retried,
-		 * so should be called fairly _frequently_(!).
-		 * */
-		if (ctx->next_misc_timeout < fiber_time64()) {
-			rc = mosquitto_loop_misc(ctx->mosq);
-			ctx->next_misc_timeout = fiber_time64() + 1200;
-		}
-	}
+    int rc = mosq_poll_one_ctx(ctx, revents, timeout, max_packets);
 
 	return make_mosq_status_result(L, rc);
 }
@@ -601,7 +636,7 @@ static const struct define main_defs[] = {
 	{"DISCONNECT",	DISCONNECT},
 	{"PUBLISH",		PUBLISH},
 	{"MESSAGE",		MESSAGE},
-	{"SUBSCRIB",	SUBSCRIBE},
+	{"SUBSCRIBE",	SUBSCRIBE},
 	{"UNSUBSCRIBE",	UNSUBSCRIBE},
 
 	/** Log levels [[
@@ -619,7 +654,8 @@ static const struct define main_defs[] = {
 	{NULL,			0}
 };
 
-static void
+static
+void
 mosq_register_defs(lua_State *L, const struct define *defs)
 {
 	while (defs->name) {
@@ -687,8 +723,9 @@ static const struct luaL_Reg M[] = {
 /*
  * Lib initializer
  */
-LUA_API int
-luaopen_mqtt(lua_State *L)
+LUA_API
+int
+luaopen_mqtt_driver(lua_State *L)
 {
 	mosquitto_lib_init();
 	mosq_initialized = true;
