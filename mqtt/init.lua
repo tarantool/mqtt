@@ -59,11 +59,14 @@ local new = function(id, clean_session)
   return setmetatable({
     VERSION = mqtt:version(), -- Str fmt: X.X.X
     RECONNECT_INTERVAL = 0.5,
+    POLL_INTERVAL = 0.0,
 
     mqtt = mqtt,
     connected = false,
     auto_reconect = true,
     fiber = nil,
+
+    subscribers = {},
   }, mqtt_mt)
 end
 
@@ -87,7 +90,17 @@ mqtt_mt = {
     end,
     __try_reconnect = function(self)
       while not self.connected do
+
+        -- Reconnect
         self.connected, _ = self.mqtt:reconnect()
+
+        -- Restoring subscribing
+        if self.connected then
+          for topic, opts in pairs(self.subscribers) do
+            self.connected, _ = self.mqtt:subscribe(topic, opts.qos)
+          end
+        end
+
         fiber.sleep(self.RECONNECT_INTERVAL)
       end
     end,
@@ -102,10 +115,11 @@ mqtt_mt = {
           if self.auto_reconect then
             self:__try_reconnect()
           else
-            log.error("mqtt[STOPED]: lost connection, error: '%s'", emsg)
+            log.error(
+              "mqtt: the client is not currently connected, error %s", emsg)
           end
         end
-        fiber.sleep(0.3)
+        fiber.sleep(self.POLL_INTERVAL)
       end
     end,
 
@@ -164,13 +178,28 @@ mqtt_mt = {
 
       -- Start work
       self.fiber = fiber.create(
-          function()
-            self:__try_connect(opts)
-            self:__poll_forever()
-          end
-      )
+        function()
+          self:__try_connect(opts)
+          self:__poll_forever()
+        end)
 
       return true
+    end,
+
+    --
+    -- Reconnect to a broker.
+    --
+    --  This function provides an easy way of reconnecting to a broker after a
+    --  connection has been lost. It uses the values that were provided in the
+    --  <connect> call. It must not be called before
+    --  <connect>.
+    --
+    --  NOTE
+    --    After reconnecting you must call<subscribe> for subscribing
+    --    to a topics.
+    --
+    reconnect = function()
+      return self.mqtt:reconnect()
     end,
 
     --
@@ -180,11 +209,30 @@ mqtt_mt = {
     --  sub -  the subscription pattern.
     --  qos -  the requested Quality of Service for this subscription.
     --
-    --Returns:
-    -- true or false, integer mid
+    -- Returns:
+    --  true or false, integer mid or error message
     --
-    subscribe = function(self, channel, qos)
-      return self.mqtt:subscribe(channel, qos)
+    subscribe = function(self, topic, qos)
+      local ok, mid_or_emsg = self.mqtt:subscribe(topic, qos)
+      if ok then
+        self.subscribers[topic] = {qos = qos}
+      end
+      return ok, mid_or_emsg
+    end,
+
+    --
+    -- Unsubscribe from a topic.
+    --
+    -- Parameters:
+    --  topic - the unsubscription pattern.
+    --
+    -- Returns:
+    --  true or false, integer mid or error message
+    --
+    unsubscribe = function(self, topic)
+      local ok, emsg = self.mqtt:unsubscribe(topic)
+      self.subscribers[topic] = nil
+      return ok, emsg
     end,
 
     --
