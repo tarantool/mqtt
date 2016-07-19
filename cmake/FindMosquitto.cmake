@@ -5,15 +5,15 @@
 #  MOSQUITTO_LIBRARIES   - List of libraries when using libmosquitto.
 #  MOSQUITTO_FOUND       - True if libmosquitto found.
 
-find_path(
-  MOSQUITTO_INCLUDE_DIR mosquitto.h
-  HINTS ENV MOSQ_INCLUDE_DIR)
+if (NOT MOSQUITTO_INCLUDE_DIR)
+  find_path(MOSQUITTO_INCLUDE_DIR mosquitto.h)
+endif()
 
-find_library(
-  MOSQUITTO_LIBRARY
-  NAMES libmosquitto libmosquitto.so.1
-  HINTS ${MOSQ_LIB_DIR} ENV MOSQ_LIB_DIR
-  PATHS ${MOSQ_LIB_DIR} ENV MOSQ_LIB_DIR)
+if (NOT MOSQUITTO_LIBRARY)
+  find_library(
+    MOSQUITTO_LIBRARY
+    NAMES libmosquitto libmosquitto.so.1 libmosquitto.dylid)
+endif()
 
 include(FindPackageHandleStandardArgs)
 
