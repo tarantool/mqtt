@@ -33,16 +33,17 @@ Key features
 
 ## Compilation and install
 --------------------------
-
   Before reading any further, make sure, you have installed MQTT broker
 
 ### Build from source
 
-  $ git clone https://github.com/tarantool/mqtt.git
-  $ cd mqtt
-  $ git submodule update --init --recursive
-  $ cmake .
-  $ make
+```bash
+$ git clone https://github.com/tarantool/mqtt.git
+$ cd mqtt
+$ git submodule update --init --recursive
+$ cmake .
+$ make
+```
 
 [Back to content](#content)
 
@@ -356,7 +357,7 @@ Lua API documentation
    true or false, emsg
 
   See Also:
-   [insecure_set](#insecure_set)
+   [tls_insecure_set](#tls_insecure_set)
 
 ```lua
   mqtt = require('mqtt')
