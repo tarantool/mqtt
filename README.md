@@ -1,7 +1,7 @@
 # Tarantool MQTT client
 ---------------------------------
 Key features
-* allowing to create communication with MQTT broker in non-blocking way
+* allows to create communication with MQTT broker in non-blocking way
 * TLS supported
 * pretty low overheads, code based on libmosquitto
 
