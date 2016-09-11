@@ -202,7 +202,7 @@ mqtt_mt = {
     --  See
     --    <connect> <opts.auto_reconect>
     --
-    reconnect = function()
+    reconnect = function(self)
       return self.mqtt:reconnect()
     end,
 
@@ -271,7 +271,7 @@ mqtt_mt = {
     --  true or false, emsg
     --
     will_set = function(self, topic, payload, qos, retain)
-      return mqtt:will_set(topic, payload, qos, retain)
+      return self.mqtt:will_set(topic, payload, qos, retain)
     end,
 
     --
@@ -283,7 +283,7 @@ mqtt_mt = {
     --  true or false, emsg
     --
     will_clear = function(self)
-      return mqtt:will_clear()
+      return self.mqtt:will_clear()
     end,
 
     --
@@ -305,7 +305,7 @@ mqtt_mt = {
     --  true or false, emsg
     --
     login_set = function(self, username, password)
-      return mqtt:login_set(username, password)
+      return self.mqtt:login_set(username, password)
     end,
 
     --
@@ -327,7 +327,7 @@ mqtt_mt = {
     --  true or false, emsg
     --
     tls_insecure_set = function(self, value)
-      return mqtt:tls_insecure_set(value)
+      return self.mqtt:tls_insecure_set(value)
     end,
 
     --
@@ -364,7 +364,7 @@ mqtt_mt = {
     --	<insecure_set>
     --
     tls_set = function(self, cafile, capath, certfile, keyfile)
-      return mqtt:tls_set(cafile, capath, certfile, keyfile)
+      return self.mqtt:tls_set(cafile, capath, certfile, keyfile)
     end,
 
     --

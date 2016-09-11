@@ -1,4 +1,5 @@
 add_library(driver SHARED driver.c)
+message(STATUS ${MOSQUITTO_LIBRARIES})
 target_link_libraries(driver ${MOSQUITTO_LIBRARIES} -rdynamic)
 set_target_properties(driver PROPERTIES PREFIX "" OUTPUT_NAME "driver")
 install(TARGETS driver LIBRARY DESTINATION ${TARANTOOL_INSTALL_LIBDIR}/mqtt)

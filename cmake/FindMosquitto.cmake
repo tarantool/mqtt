@@ -12,7 +12,7 @@ endif()
 if (NOT MOSQUITTO_LIBRARY)
   find_library(
     MOSQUITTO_LIBRARY
-    NAMES libmosquitto libmosquitto.so.1 libmosquitto.dylid)
+    NAMES libmosquitto libmosquitto.so* libmosquitto.dylid)
 endif()
 
 include(FindPackageHandleStandardArgs)

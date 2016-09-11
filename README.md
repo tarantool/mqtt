@@ -41,8 +41,7 @@ Key features
 $ git clone https://github.com/tarantool/mqtt.git
 $ cd mqtt
 $ git submodule update --init --recursive
-$ cmake .
-$ make
+$ ./bootstrap.sh
 ```
 
 [Back to content](#content)

@@ -22,4 +22,3 @@ external_dependencies = {
 build = {
 	type = "cmake",
 }
-
