@@ -75,7 +75,7 @@ Lua API documentation
 
 ```lua
   mqtt = require('mqtt')
-  instance = mqtt.new(1, true)
+  instance = mqtt.new("client_id", true)
 ```
 
 [Back to content](#content)
@@ -100,7 +100,7 @@ Lua API documentation
 
 ```lua
   mqtt = require('mqtt')
-  instance = mqtt.new(1, true)
+  instance = mqtt.new("client_id", true)
   instance:connect({
     host='127.0.0.1',
     port=1883,
@@ -130,7 +130,7 @@ Lua API documentation
 
 ```lua
   mqtt = require('mqtt')
-  instance = mqtt.new(1, true)
+  instance = mqtt.new("client_id", true)
   instance:connect({host='127.0.0.1', port=1883, auto_reconect=false})
 
   ok, emsg_or_mid = instance:subscribe('topic')
@@ -156,8 +156,9 @@ Lua API documentation
 
 ```lua
   mqtt = require('mqtt')
-  -- Cut, see [new](#new) and [connect](#connect)
-  ok, err_or_mid = mqtt:subscribe('my/topic/#', 1)
+  instance = mqtt.new("client_id", true)
+  -- Cut, see [connect](#connect)
+  ok, err_or_mid = instance:subscribe('my/topic/#', 1)
   if ok then
     print(ok, err_or_mid)
   end
@@ -178,8 +179,9 @@ Lua API documentation
 
 ```lua
   mqtt = require('mqtt')
-  -- Cut, see [new](#new) and [connect](#connect)
-  ok, err = mqtt:unsubscribe('my/topic/#')
+  instance = mqtt.new("client_id", true)
+  -- Cut, see [connect](#connect)
+  ok, err = instance:unsubscribe('my/topic/#')
   if ok then
     print(ok, err)
   end
@@ -204,8 +206,9 @@ Lua API documentation
 
 ```lua
   mqtt = require('mqtt')
-  -- Cut, see [new](#new) and [connect](#connect)
-  ok, err = mqtt:publish('my/topic/#', 'Some payload as string', 0, true)
+  instance = mqtt.new("client_id", true)
+  -- Cut, see [connect](#connect)
+  ok, err = instance:publish('my/topic/#', 'Some payload as string', 0, true)
   if ok then
     print(ok, err)
   end
@@ -231,8 +234,9 @@ Lua API documentation
 
 ```lua
   mqtt = require('mqtt')
-  -- Cut, see [new](#new) and [connect](#connect)
-  ok, err = mqtt:will_set('my/topic/#', 'Some payload as string', 0, true)
+  instance = mqtt.new("client_id", true)
+  -- Cut, see [connect](#connect)
+  ok, err = instance:will_set('my/topic/#', 'Some payload as string', 0, true)
   if ok then
     print(ok, err)
   end
@@ -251,8 +255,9 @@ Lua API documentation
 
 ```lua
   mqtt = require('mqtt')
-  -- Cut, see [new](#new) and [connect](#connect)
-  ok, err = mqtt:will_clear()
+  instance = mqtt.new("client_id", true)
+  -- Cut, see [connect](#connect)
+  ok, err = instance:will_clear()
   if ok then
     print(ok, err)
   end
@@ -283,8 +288,9 @@ Lua API documentation
 
 ```lua
   mqtt = require('mqtt')
-  -- Cut, see [new](#new) and [connect](#connect)
-  ok, err = mqtt:login_set('user', 'password')
+  instance = mqtt.new("client_id", true)
+  -- Cut, see [connect](#connect)
+  ok, err = instance:login_set('user', 'password')
   if ok then
     print(ok, err)
   end
@@ -315,8 +321,9 @@ Lua API documentation
 
 ```lua
   mqtt = require('mqtt')
-  -- Cut, see [new](#new) and [connect](#connect)
-  ok, err = mqtt:tls_insecure_set(true)
+  instance = mqtt.new("client_id", true)
+  -- Cut, see [connect](#connect)
+  ok, err = instance:tls_insecure_set(true)
   if ok then
     print(ok, err)
   end
@@ -361,8 +368,9 @@ Lua API documentation
 
 ```lua
   mqtt = require('mqtt')
-  -- Cut, see [new](#new) and [connect](#connect)
-  ok, err = mqtt:tls_set('my.pem', '/home/user/pems', 'my.ca', 'my.key')
+  instance = mqtt.new("client_id", true)
+  -- Cut, see [connect](#connect)
+  ok, err = instance:tls_set('my.pem', '/home/user/pems', 'my.ca', 'my.key')
   if ok then
     print(ok, err)
   end
@@ -384,8 +392,9 @@ Lua API documentation
 
 ```lua
   mqtt = require('mqtt')
-  -- Cut, see [new](#new) and [connect](#connect)
-  ok, err = mqtt:on_message(
+  instance = mqtt.new("client_id", true)
+  -- Cut, see [connect](#connect)
+  ok, err = instance:on_message(
     function(message_id, topic, payload, gos, retain)
       print('Recv. new message',
         message_id, topic, payload, gos, retain)
