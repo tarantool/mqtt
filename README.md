@@ -198,8 +198,11 @@ Lua API documentation
     topic -      null terminated string of the topic to publish to.
  	  payload -    pointer to the data to send.
  	  qos -        integer value 0, 1 or 2 indicating the Quality of Service to be
-                 used for the message.
- 	  retain -     set to true to make the message retained.
+                 used for the message.When you call the library as "mqtt = require('mqtt')" 
+                 can be used mqtt.QOS_0, mqtt.QOS_1 and mqtt.QOS_2 as a replacement for some strange
+                 digital variable
+ 	  retain -     set to true to make the message retained. You can also use the values
+                 mqtt.RETAIN and mqtt.NON_RETAIN to replace the unmarked variable
 
   Returns:
     true or false, emsg, message id(e.g. MID) is referenced in the publish callback
@@ -208,7 +211,7 @@ Lua API documentation
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
   -- Cut, see [connect](#connect)
-  ok, err = instance:publish('my/topic/#', 'Some payload as string', 0, true)
+  ok, err = instance:publish('my/topic/#', 'Some payload as string', mqtt.QOS_0, mqtt.RETAIN)
   if ok then
     print(ok, err)
   end
