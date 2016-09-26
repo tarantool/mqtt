@@ -2,7 +2,6 @@
   <img src="https://travis-ci.org/tarantool/mqtt.png?branch=master">
 </a>
 
-
 # Tarantool MQTT client
 ---------------------------------
 Key features
