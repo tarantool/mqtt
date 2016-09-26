@@ -1,0 +1,37 @@
+sudo: required
+services:
+  - docker
+
+language: c
+compiler: gcc
+
+env:
+  global:
+    - PRODUCT=tarantool-mqtt
+  matrix:
+    - PACK=none
+    - OS=el DIST=7 PACK=rpm
+    - OS=fedora DIST=23 PACK=rpm
+    - OS=fedora DIST=24 PACK=rpm
+    - OS=ubuntu DIST=wily PACK=deb
+    - OS=ubuntu DIST=xenial PACK=deb
+    - OS=debian DIST=jessie PACK=deb
+
+matrix:
+  allow_failures:
+    - env: OS=el DIST=7 PACK=rpm
+    - env: OS=fedora DIST=23 PACK=rpm
+    - env: OS=fedora DIST=24 PACK=rpm
+    - env: OS=ubuntu DIST=wily PACK=deb
+    - env: OS=ubuntu DIST=xenial PACK=deb
+    - env: OS=debian DIST=jessie PACK=deb
+
+
+script:
+  - git clone https://github.com/tarantool/build.git
+  - PACKAGECLOUD_REPO=tarantool/1_6 REPO_PREFIX=1.6 ./build/pack/travis.sh
+  - PACKAGECLOUD_REPO=tarantool/1_7 REPO_PREFIX=1.7 ./build/pack/travis.sh
+
+notifications:
+  email: true
+  irc: false

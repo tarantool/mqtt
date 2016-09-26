@@ -1,0 +1,5 @@
+tarantool-mqtt (1.0.0-1) unstable; urgency=medium
+
+  * Initial release.
+
+ -- Konstantin Nazarov <racktear@tarantool.org>  Mon, 26 Sep 2016 19:04:00 +0300
