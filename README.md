@@ -416,16 +416,22 @@ Lua API documentation
 ### Subscribe on events
 ----------------------
 NOTE
-    Basically, you don't need this functions, so use them with caution.
-    Wrong uncorrect of following funtions might break async I/O loop!
+    Basically, you don't need those functions, so use them with caution.
+    Incorrect uses of following functions might break async I/O loop!
+
     * on_connect
+
     * on_disconnect
+
     * on_publish
+
     * on_subscribe
+
     * on_unsubscribe
+
     * on_disconnect
-    Detailed documentation of functions described above can be found
-    in the file: mqtt/init.lua
+
+    You can find Detailed documentation of those functions at file: mqtt/init.lua
 
 [Back to content](#content)
 
