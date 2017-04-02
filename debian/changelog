@@ -1,3 +1,7 @@
+tarantool-mqtt (1.2.0-1) stable; urgency=medium
+  * Build issue have been fixed.
+
+ -- Vasiliy Soshnikov <dedok.mad@gmail.com>  Sun, 2 Apr 2017 21:40:00 +0300
 tarantool-mqtt (1.1.0-1) stable; urgency=medium
 
   * RabbitMQ connection issue have been fixed.
