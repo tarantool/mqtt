@@ -9,10 +9,6 @@ Key features
 * TLS supported
 * pretty low overheads, code based on libmosquitto
 
-## Status
----------
-* v0.1 - beta
-
 ## Content
 ----------
 * [Compilation and install](#compilation-and-install)
