@@ -1,9 +1,10 @@
 tarantool-mqtt (1.1.0-1) stable; urgency=medium
 
-  * Update requires
+  * RabbitMQ connection issue have been fixed.
+  * Hight CPU usage issue have been fixed.
+  * API errors hanling have been fixed.
 
  -- Vasiliy Soshnikov <dedok.mad@gmail.com>  Sun, 2 Apr 2017 19:24:00 +0300
-
 tarantool-mqtt (1.0.0-1) unstable; urgency=medium
 
   * Initial release.
