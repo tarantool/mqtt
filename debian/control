@@ -2,12 +2,8 @@ Source: tarantool-mqtt
 Priority: optional
 Section: database
 Maintainer: Vasiliy Soshnikov <dedok.mad@gmail.com>
-Build-Depends: debhelper (>= 9), cdbs,
-               cmake (>= 2.8),
-               tarantool-dev (>= 1.6.8.0),
-               libmosquitto-dev,
-               libssl-dev,
-               mosquitto
+Build-Depends: debhelper (>= 9), cdbs, cmake (>= 2.8),
+               tarantool-dev (>= 1.6.8.0), libmosquitto-dev, libssl-dev, mosquitto
 
 Standards-Version: 3.9.6
 Homepage: https://github.com/tarantool/mqtt
