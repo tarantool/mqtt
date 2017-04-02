@@ -8,7 +8,7 @@ cd third_party
 cd -
 
 # Common
-rm -r build && mkdir -p build && cd build
+rm -rf build && mkdir -p build && cd build
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   LIBS=$PWD/../third_party/mosquitto/build/lib/libmosquitto.dylib

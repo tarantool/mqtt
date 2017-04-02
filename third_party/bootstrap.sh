@@ -4,7 +4,7 @@ set -e -x
 
 cd mosquitto
 git checkout v1.4.10
-rm -r build
+rm -rf build
 mkdir -p build
 cd build
 
