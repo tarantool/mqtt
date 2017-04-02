@@ -1,12 +1,19 @@
 #!/usr/bin/env tarantool
 
+-- Those lines of code are for debug purposes only
+-- So you have to ignore them
+-- {{
+package.preload['mqtt.driver'] = './mqtt/driver.so'
+-- }}
+
+box.cfg{wal_mode = 'none'}
+
 local mqtt = require('mqtt')
 local fiber = require('fiber')
 local yaml = require('yaml')
 local os = require('os')
 local log = require('log')
 
-box.cfg{wal_mode = 'none'}
 fan_in = box.schema.space.create('fan_in', {if_not_exists = true})
 fan_in:create_index('id')
 
@@ -51,7 +58,7 @@ W(conn:publish('channel2/messages', TIME, 0, false))
 fiber.create(function()
   while true do
 
-    if fan_in:len() > 10 then
+    if fan_in:len() > 100 then
       for k, v in pairs(fan_in:select{}) do
 
         if v[2] ~= 'channel/messages' and v[2] ~= 'channel2/messages' then
@@ -72,6 +79,6 @@ fiber.create(function()
       end
       os.exit(0)
     end
-    fiber.sleep(0.0)
+    fiber.sleep(0.1)
   end
 end)

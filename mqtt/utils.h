@@ -46,58 +46,42 @@ static inline
 int
 make_str_result(lua_State *L, bool ok, const char *str)
 {
-	lua_pushboolean(L, ok);
-	lua_pushstring(L, str);
-	return 2;
+  lua_pushboolean(L, ok);
+  lua_pushstring(L, str);
+  return 2;
 }
 
 static inline
 int
 make_int_result(lua_State *L, bool ok, int i)
 {
-	lua_pushboolean(L, ok);
-	lua_pushinteger(L, i);
-	return 2;
-}
-
-static inline
-int
-make_errorno_result(lua_State *L, int errno_, bool mosq_errno)
-{
-	lua_pushboolean(L, false);
-	if (mosq_errno) {
-		lua_pushstring(L, mosquitto_strerror(errno_));
-	} else {
-		lua_pushstring(L, strerror(errno_));
-	}
-	return 2;
+  lua_pushboolean(L, ok);
+  lua_pushinteger(L, i);
+  return 2;
 }
 
 static inline
 int
 make_mosq_status_result(lua_State *L, int mosq_errno)
 {
-	switch (mosq_errno) {
-	case MOSQ_ERR_SUCCESS:
-		return make_str_result(L, true, "ok");
+  switch (mosq_errno) {
+  case MOSQ_ERR_SUCCESS:
+    return make_str_result(L, true, "ok");
 
-	case MOSQ_ERR_INVAL:
-	case MOSQ_ERR_NOMEM:
-	case MOSQ_ERR_PROTOCOL:
-	case MOSQ_ERR_NOT_SUPPORTED:
-		return luaL_error(L, mosquitto_strerror(mosq_errno));
-
-	case MOSQ_ERR_NO_CONN:
-	case MOSQ_ERR_CONN_LOST:
-	case MOSQ_ERR_PAYLOAD_SIZE:
-		return make_errorno_result(L, mosq_errno, true);
-
-	case MOSQ_ERR_ERRNO:
-		return make_errorno_result(L, errno, false);
-	default:
-		break;
-	}
-	return make_str_result(L, false, "unknown status");
+  case MOSQ_ERR_INVAL:
+  case MOSQ_ERR_NOMEM:
+  case MOSQ_ERR_PROTOCOL:
+  case MOSQ_ERR_NOT_SUPPORTED:
+  case MOSQ_ERR_NO_CONN:
+  case MOSQ_ERR_CONN_LOST:
+  case MOSQ_ERR_PAYLOAD_SIZE:
+    return make_str_result(L, false, mosquitto_strerror(mosq_errno));
+  case MOSQ_ERR_ERRNO:
+    return make_str_result(L, false, strerror(errno));
+  default:
+    break;
+  }
+  return make_str_result(L, false, "unknown status");
 }
 
 #endif /* MOSQ_UTILS_H */

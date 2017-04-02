@@ -11,10 +11,21 @@ include_directories(${TARANTOOL_INCLUDE_DIRS})
 find_package(Mosquitto REQUIRED)
 include_directories(${MOSQUITTO_INCLUDE_DIRS})
 
+message(STATUS "tarantool: ${TARANTOOL_INCLUDE_DIRS}")
+message(STATUS "libmosquitto: ${MOSQUITTO_INCLUDE_DIRS} ${MOSQUITTO_LIBRARIES}")
+
 # Set CFLAGS
-set(MY_C_FLAGS "-Wall -Wextra -Werror -pedantic -std=gnu99")
+set(MY_C_FLAGS "-Wall -Wextra -Werror -std=gnu11 -fno-strict-aliasing")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MY_C_FLAGS}")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${MY_C_FLAGS}")
 
+include_directories(${TARANTOOL_INCLUDE_DIRS}
+                    ${MOSQUITTO_INCLUDE_DIRS})
+
 # Build module
 add_subdirectory(mqtt)
+
+add_custom_target(test
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                  COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/run.sh
+                  DEPENDS driver)

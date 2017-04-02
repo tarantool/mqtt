@@ -32,6 +32,7 @@
 local mqtt_driver = require('mqtt.driver')
 local fiber = require('fiber')
 local log = require('log')
+local json = require('json')
 
 local mqtt_mt
 
@@ -39,9 +40,9 @@ local mqtt_mt
 --  Create a new mosquitto client instance.
 --
 --  Parameters:
---  	id -            String to use as the client id. If NULL, a random client id
---  	                will be generated. If id is NULL, clean_session must be true.
---  	clean_session - set to true to instruct the broker to clean all messages
+--    id -            String to use as the client id. If NULL, a random client id
+--                    will be generated. If id is NULL, clean_session must be true.
+--    clean_session - set to true to instruct the broker to clean all messages
 --                   and subscriptions on disconnect, false to instruct it to
 --                   keep them. See the man page mqtt(7) for more details.
 --                   Note that a client will never discard its own outgoing
@@ -56,18 +57,18 @@ local mqtt_mt
 --
 local new = function(id, clean_session)
   local mqtt = mqtt_driver.new(id, clean_session)
-  return setmetatable({
-    VERSION = mqtt:version(), -- Str fmt: X.X.X
-    RECONNECT_INTERVAL = 0.5,
-    POLL_INTERVAL = 0.0,
+  local ok, version_string = mqtt.version()
 
-    mqtt = mqtt,
-    connected = false,
-    auto_reconect = true,
-    fiber = nil,
+  return setmetatable({VERSION = version_string,
+                       RECONNECT_INTERVAL = 0.5,
+                       POLL_INTERVAL = 0.0,
 
-    subscribers = {},
-  }, mqtt_mt)
+                       mqtt = mqtt,
+                       connected = false,
+                       auto_reconect = true,
+                       fiber = nil,
+
+                       subscribers = {}, }, mqtt_mt)
 end
 
 mqtt_mt = {
@@ -77,46 +78,40 @@ mqtt_mt = {
     --
     -- Private functions
     --
-
-    -- [Re]Connect until not connected [[
-    __try_connect = function(self, opts)
+    __connect = function(self, opts)
       local host = self:__opt_get_or_nil(opts, 'host')
       local port = self:__opt_get_or_nil(opts, 'port')
       local keepalive = self:__opt_get_or_nil(opts, 'keepalive')
-      while not self.connected do
-        self.connected, _ = self.mqtt:connect(host, port, keepalive)
-        fiber.sleep(self.RECONNECT_INTERVAL)
-      end
+      return self.mqtt:connect(host, port, keepalive)
     end,
-    __try_reconnect = function(self)
-      while not self.connected do
 
+    -- [Re]Connect until not connected [[
+    __reconnect = function(self)
+      while not self.connected do
         -- Reconnect
         self.connected, _ = self.mqtt:reconnect()
-
         -- Restoring subscribing
         if self.connected then
           for topic, opts in pairs(self.subscribers) do
             self.connected, _ = self.mqtt:subscribe(topic, opts.qos)
           end
         end
-
         fiber.sleep(self.RECONNECT_INTERVAL)
       end
     end,
     -- ]]
 
     -- BG work
-    __poll_forever = function(self)
+    __io_loop = function(self)
       local mq = self.mqtt
       while true do
-        self.connected, _ = mq:poll_one()
+        self.connected, _ = mq:io_run_one()
         if not self.connected then
           if self.auto_reconect then
-            self:__try_reconnect()
+            self:__reconnect()
           else
             log.error(
-              "mqtt: the client is not currently connected, error %s", emsg)
+              'mqtt: the client is not currently connected, error %s', emsg)
           end
         end
         fiber.sleep(self.POLL_INTERVAL)
@@ -151,9 +146,9 @@ mqtt_mt = {
     -- Connect to an MQTT broker.
     --
     -- Parameters:
-    -- 	opts.host          - the hostname or ip address of the broker to connect to.
-    -- 	opts.port          - the network port to connect to. Usually 1883.
-    -- 	opts.keepalive     - the number of seconds after which the broker should send a PING
+    --  opts.host          - the hostname or ip address of the broker to connect to.
+    --  opts.port          - the network port to connect to. Usually 1883.
+    --  opts.keepalive     - the number of seconds after which the broker should send a PING
     --                       message to the client if no other messages have been exchanged
     --                       in that time.
     --  opts.log_mask      - LOG_NONE, LOG_INFO, LOG_NOTICE, LOG_WARNING,
@@ -169,22 +164,18 @@ mqtt_mt = {
 
       self.auto_reconect = self:__opt_get(opts, 'auto_reconect', true)
 
-      local ok, emsg
-
       -- Setup logger
-      ok, emsg = self:__default_logger_set(opts)
+      local ok, emsg = self:__default_logger_set(opts)
       if not ok then
         return ok, emsg
       end
 
-      -- Start work
-      self.fiber = fiber.create(
-        function()
-          self:__try_connect(opts)
-          self:__poll_forever()
-        end)
+      ok, emsg = self:__connect(opts)
+      if ok then
+        self.fiber = fiber.create(self.__io_loop, self)
+      end
 
-      return true
+      return ok, emsg
     end,
 
     --
@@ -244,7 +235,7 @@ mqtt_mt = {
     --
     -- Parameters:
     --  topic -      null terminated string of the topic to publish to.
-    --  payload -    pointer to the data to send.
+    --  payload -    some data (e.g. number, string) or table.
     --  qos -        integer value 0, 1 or 2 indicating the Quality of Service to be
     --               used for the will. When you call the library as "mqtt = require('mqtt')" 
     --               can be used mqtt.QOS_0, mqtt.QOS_1 and mqtt.QOS_2 as a replacement for some strange
@@ -256,7 +247,11 @@ mqtt_mt = {
     --   true or false, emsg, message id(e.g. MID) is referenced in the publish callback
     --
     publish = function(self, topic, payload, qos, retail)
-      return self.mqtt:publish(topic, payload, qos, retail)
+      local raw_payload = payload
+      if type(payload) == 'table' then
+        raw_payload = json.encode(payload)
+      end
+      return self.mqtt:publish(topic, raw_payload, qos, retail)
     end,
 
     --
@@ -264,11 +259,11 @@ mqtt_mt = {
     -- not have a will.  This must be called before calling <connect>.
     --
     -- Parameters:
-    -- 	topic -      the topic on which to publish the will.
-    -- 	payload -    pointer to the data to send.
-    -- 	qos -        integer value 0, 1 or 2 indicating the Quality of Service to be
+    --  topic -      the topic on which to publish the will.
+    --  payload -    pointer to the data to send.
+    --  qos -        integer value 0, 1 or 2 indicating the Quality of Service to be
     --               used for the will.
-    -- 	retain -     set to true to make the will a retained message.
+    --  retain -     set to true to make the will a retained message.
     --
     -- Returns:
     --  true or false, emsg
@@ -299,10 +294,10 @@ mqtt_mt = {
     -- This is must be called before calling <connect>.
     --
     -- Parameters:
-    -- 	username - the username to send as a string, or NULL to disable
+    --  username - the username to send as a string, or NULL to disable
     --             authentication.
-    -- 	password - the password to send as a string. Set to NULL when username is
-    -- 	           valid in order to send just a username.
+    --  password - the password to send as a string. Set to NULL when username is
+    --             valid in order to send just a username.
     --
     -- Returns:
     --  true or false, emsg
@@ -364,7 +359,7 @@ mqtt_mt = {
     --  true or false, emsg
     --
     -- See Also:
-    --	<insecure_set>
+    --   <insecure_set>
     --
     tls_set = function(self, cafile, capath, certfile, keyfile)
       return self.mqtt:tls_set(cafile, capath, certfile, keyfile)
@@ -411,9 +406,9 @@ mqtt_mt = {
     --
     -- Parameters:
     --  F - a callback function in the following form:
-    --      function F(integer_mid, array_of_gos)
+    --      function F(integer_mid, array_of_qos)
     --      integer_mid - the message id of the subscribe message.
-    --      array_of_gos - an array of integers indicating the granted QoS for
+    --      array_of_qos - an array of integers indicating the granted QoS for
     --                     each of the subscriptions.
     -- Returns:
     --  true or false, emsg
@@ -459,7 +454,7 @@ mqtt_mt = {
     --
     -- Parameters:
     --  F - a callback function in the following form:
-    --      function F(integer_mid, string_topic, string_payload, integer_gos, integer_retain)
+    --      function F(integer_mid, string_topic, string_payload, integer_qos, integer_retain)
     --
     -- Returns:
     --  true or false, emsg
