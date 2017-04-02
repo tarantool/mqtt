@@ -33,10 +33,17 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
+#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
+#include <mosquitto.h>
+
 #include <tarantool/module.h>
 
-#include "utils.h"
 
+#ifndef TIMEOUT_INFINITY
+#  define TIMEOUT_INFINITY ((size_t)-1)
+#endif /*TIMEOUT_INFINITY*/
 
 #define MOSQ_LUA_UDATA_NAME "__tnt_mqtt_mosquitto"
 
@@ -79,7 +86,48 @@ static bool mosq_initialized = false;
 static inline mosq_t*
 mosq_get(lua_State *L, int i)
 {
-  return (mosq_t *) luaL_checkudata(L, i, MOSQ_LUA_UDATA_NAME);
+    return (mosq_t *) luaL_checkudata(L, i, MOSQ_LUA_UDATA_NAME);
+}
+
+static inline int
+make_str_result(lua_State *L, bool ok, const char *str)
+{
+    lua_pushboolean(L, ok);
+    lua_pushstring(L, str);
+    return 2;
+}
+
+static inline
+int
+make_int_result(lua_State *L, bool ok, int i)
+{
+    lua_pushboolean(L, ok);
+    lua_pushinteger(L, i);
+    return 2;
+}
+
+static inline
+int
+make_mosq_status_result(lua_State *L, int mosq_errno)
+{
+    switch (mosq_errno) {
+    case MOSQ_ERR_SUCCESS:
+      return make_str_result(L, true, "ok");
+
+    case MOSQ_ERR_INVAL:
+    case MOSQ_ERR_NOMEM:
+    case MOSQ_ERR_PROTOCOL:
+    case MOSQ_ERR_NOT_SUPPORTED:
+    case MOSQ_ERR_NO_CONN:
+    case MOSQ_ERR_CONN_LOST:
+    case MOSQ_ERR_PAYLOAD_SIZE:
+      return make_str_result(L, false, mosquitto_strerror(mosq_errno));
+    case MOSQ_ERR_ERRNO:
+      return make_str_result(L, false, strerror(errno));
+    default:
+      break;
+    }
+    return make_str_result(L, false, "unknown status");
 }
 
 static int
@@ -377,7 +425,7 @@ mosq_connect_f(struct mosquitto *mosq __attribute__((unused)),
     bool success = false;
     const char *str = "connection status unknown";
 
-    switch(return_code) {
+    switch (return_code) {
     case CONN_ACCEPT:
         success = true;
         str = "connection accepted";
