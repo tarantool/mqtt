@@ -12,4 +12,5 @@ Package: tarantool-mqtt
 Architecture: i386 amd64 armhf arm64
 Depends: tarantool (>= 1.6.8.0), libmosquitto1, ${shlibs:Depends}, ${misc:Depends}
 Pre-Depends: ${misc:Pre-Depends}
-Description: This package provides a MQTT bindings for Tarantool.
+Description: tarantool-mqtt is a MQTT client for Tarantool
+ This package provides a MQTT bindings for Tarantool.
