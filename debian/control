@@ -1,19 +1,21 @@
 Source: tarantool-mqtt
 Priority: optional
 Section: database
-Maintainer: Eugene Blikh <bigbes@tarantool.org>
+Maintainer: Vasiliy Soshnikov <dedok.mad@gmail.com>
 Build-Depends: debhelper (>= 9), cdbs,
                cmake (>= 2.8),
                tarantool-dev (>= 1.6.8.0),
-               libmosquitto-dev
+               libmosquitto-dev,
+               mosquitto,
+               openssl-dev
+
 Standards-Version: 3.9.6
-Homepage: https://github.com/tarantool/memcached
-Vcs-Git: git://github.com/tarantool/memcached.git
-Vcs-Browser: https://github.com/tarantool/memcached
+Homepage: https://github.com/tarantool/mqtt
+Vcs-Git: git://github.com/tarantool/mqtt.git
+Vcs-Browser: https://github.com/tarantool/mqtt
 
 Package: tarantool-mqtt
 Architecture: i386 amd64 armhf arm64
 Depends: tarantool (>= 1.6.8.0), libmosquitto1, ${shlibs:Depends}, ${misc:Depends}
 Pre-Depends: ${misc:Pre-Depends}
-Description: MQTT bindings for Tarantool
- This package provides a MQTT bindings for Tarantool.
+Description: This package provides a MQTT bindings for Tarantool.

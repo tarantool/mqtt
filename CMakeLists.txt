@@ -27,5 +27,5 @@ add_subdirectory(mqtt)
 
 add_custom_target(test
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                  COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/run.sh
+                  COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/test/run_all.sh
                   DEPENDS driver)
