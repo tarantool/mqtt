@@ -1,13 +1,13 @@
 package = "mqtt"
-version = "scm-1"
+version = "1.2.1-1"
 source = {
     url = "git://github.com/tarantool/mqtt.git",
-    tag = "master"
+    tag = "1.2.1"
 }
 description = {
     summary = "Mqtt connector for Tarantool",
     homepage = "https://github.com/tarantool/mqtt",
-    license = "MIT"
+    license = "BSD"
 }
 dependencies = {
     "lua >= 5.1"
