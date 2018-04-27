@@ -425,8 +425,6 @@ NOTE
 
     * on_unsubscribe
 
-    * on_disconnect
-
     You can find Detailed documentation of those functions at file: mqtt/init.lua
 
 [Back to content](#content)
