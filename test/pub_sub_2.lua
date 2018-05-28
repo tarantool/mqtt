@@ -40,9 +40,9 @@ fiber.create(function()
   end))
 
   F(sub:tls_insecure_set(false))
-  F(sub:login_set('user', 'password'))
+  F(sub:login_set('guest', 'guest'))
   F('connect', sub:connect({host="127.0.0.1", port=1883}))
-  F(sub:subscribe('publisher'))
+  F(sub:subscribe('/'))
 
   -- Join
   fiber.sleep(5.0)
@@ -60,9 +60,9 @@ F(conn:on_publish(function(mid)
   stat.published = stat.published + 1
 end))
 F(conn:tls_insecure_set(false))
-F(conn:login_set('user', 'password'))
+F(conn:login_set('guest', 'guest'))
 F('connect', conn:connect({host="127.0.0.1", port=1883}))
 for i = 1, 1000 do
-  F(conn:publish('publisher', 'data_1', 0, false))
+  F(conn:publish('/', 'data_1', 0, false))
   stat.pulish_called = stat.pulish_called + 1
 end
