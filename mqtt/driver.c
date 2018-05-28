@@ -1,5 +1,6 @@
+
 /*
- * Copyright (C) 2016 Tarantool AUTHORS: please see AUTHORS file.
+ * Copyright (C) 2016 - 2018 Tarantool AUTHORS: please see AUTHORS file.
  *
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the following
@@ -41,9 +42,7 @@
 #include <tarantool/module.h>
 
 
-#ifndef TIMEOUT_INFINITY
-#  define TIMEOUT_INFINITY ((size_t)-1)
-#endif /*TIMEOUT_INFINITY*/
+#define TIMEOUT 1.0
 
 #define MOSQ_LUA_UDATA_NAME "__tnt_mqtt_mosquitto"
 
@@ -58,7 +57,6 @@ typedef struct mosq_ctx {
   int unsubscribe_ref;
   int log_ref;
 
-  uint64_t next_misc_timeout;
   int log_level_mask;
 } mosq_t;
 
@@ -136,30 +134,32 @@ mosq_do_io_run_one(mosq_t *ctx, int max_packets)
     /** XXX
      * I have confused: socket < 0 means MOSQ_ERR_NO_CONN, or?
      */
-    int rc = MOSQ_ERR_NO_CONN;
-
-    int fd = mosquitto_socket(ctx->mosq);
+    int rc = MOSQ_ERR_NO_CONN,
+        revents = 0,
+        fd = mosquitto_socket(ctx->mosq);
 
     if (fd >= 0) {
 
+        rc = MOSQ_ERR_SUCCESS;
+
         if (mosquitto_want_write(ctx->mosq)) {
-            coio_wait(fd, COIO_WRITE, TIMEOUT_INFINITY);
-            rc = mosquitto_loop_write(ctx->mosq, max_packets);
+            revents = coio_wait(fd, COIO_WRITE, TIMEOUT);
+            if (revents > 0) {
+                rc = mosquitto_loop_write(ctx->mosq, max_packets);
+            }
         } else {
-            coio_wait(fd, COIO_READ, TIMEOUT_INFINITY);
-            rc = mosquitto_loop_read(ctx->mosq, max_packets);
+            revents = coio_wait(fd, COIO_READ, TIMEOUT);
+            if (revents > 0)
+                rc = mosquitto_loop_read(ctx->mosq, max_packets);
         }
         /**
          * mosquitto_loop_miss
-         * This function deals with handling PINGs and checking
+         * This function is handling PINGs and checking
          * whether messages need to be retried,
          * so should be called fairly _frequently_(!).
          * */
-        if (rc == MOSQ_ERR_SUCCESS &&
-            ctx->next_misc_timeout < fiber_time64())
-        {
+        if (rc == MOSQ_ERR_SUCCESS) {
             rc = mosquitto_loop_misc(ctx->mosq);
-            ctx->next_misc_timeout = fiber_time64() + 1200;
         }
     }
 
@@ -359,7 +359,8 @@ int
 mosq_publish(lua_State *L)
 {
     mosq_t *ctx = mosq_get(L, 1);
-    int mid;    /* message id is referenced in the publish callback */
+    /* message id is referenced in the publish callback */
+    int mid = -1;
     const char *topic = luaL_checkstring(L, 2);
     size_t payloadlen = 0;
     const void *payload = NULL;
@@ -371,8 +372,8 @@ mosq_publish(lua_State *L)
     int qos = luaL_optinteger(L, 4, 0);
     bool retain = lua_toboolean(L, 5);
 
-    int rc = mosquitto_publish(ctx->mosq, &mid, topic, payloadlen, payload, qos, retain);
-
+    int rc = mosquitto_publish(ctx->mosq, &mid, topic, payloadlen, payload,
+            qos, retain);
     if (rc != MOSQ_ERR_SUCCESS) {
         return make_mosq_status_result(L, rc);
     }
