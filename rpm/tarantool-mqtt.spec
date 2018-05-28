@@ -1,5 +1,5 @@
 Name: tarantool-mqtt
-Version: 1.2
+Version: 1.3
 Release: 1%{?dist}
 Summary: Tarantool MQTT module
 Group: Applications/Databases
@@ -10,10 +10,12 @@ BuildRequires: cmake >= 2.8
 BuildRequires: gcc >= 4.5
 BuildRequires: tarantool >= 1.6.8.0
 BuildRequires: tarantool-devel >= 1.6.8.0
-Requires: mosquitto >= 1.4.8
 BuildRequires: mosquitto-devel >= 1.4.8
-Requires: openssl
+BuildRequires: mosquitto >= 1.4.8
 BuildRequires: openssl-devel
+
+Requires: mosquitto >= 1.4.8
+Requires: openssl
 
 %description
 Tarantool bindings to mqtt library
@@ -37,6 +39,11 @@ make -j2 test
 %license LICENSE
 
 %changelog
+* Mon May 28 2018 V. Soshnikov <dedok.mad@gmail.com> 1.3.0
+- Fixed: https://github.com/tarantool/mqtt/issues/12
+- Fixed: https://github.com/tarantool/mqtt/issues/11
+- Fixed: https://github.com/tarantool/mqtt/issues/9
+
 * Sun Apr 2 2017 V. Soshnikov <dedok.mad@gmail.com> 1.1.0
 - Update requires
 
