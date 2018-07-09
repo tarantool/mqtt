@@ -192,7 +192,7 @@ mosq_lib_init(lua_State *L)
 
 static
 int
-mosq_lib_cleanup(lua_State *L)
+mosq_lib_destroy(lua_State *L)
 {
     mosquitto_lib_cleanup();
     mosq_initialized = false;
@@ -656,6 +656,10 @@ static int
 mosq_io_run_one(lua_State *L)
 {
     mosq_t *ctx = mosq_get(L, 1);
+    if (!ctx || !ctx->mosq) {
+        say_error("mosq_io_run_one() called but object was destroyed");
+        return 0;
+    }
     int max_packets = luaL_optinteger(L, 2, 1);
     return make_mosq_status_result(L, mosq_do_io_run_one(ctx, max_packets));
 }
@@ -699,8 +703,7 @@ static const struct define defines[] = {
 static const struct luaL_Reg R[] = {
     {"version", mosq_lib_version},
     {"init",    mosq_lib_init},
-    {"cleanup", mosq_lib_cleanup},
-    {"__gc",    mosq_lib_cleanup},
+    {"lib_destroy", mosq_lib_destroy},
     {"new",     mosq_new},
     {NULL, NULL}
 };
@@ -708,7 +711,6 @@ static const struct luaL_Reg R[] = {
 static const struct luaL_Reg M[] = {
 
     {"destroy", mosq_destroy},
-    {"__gc",    mosq_destroy},
 
     /** Setup, options, misc [[
      */

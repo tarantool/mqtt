@@ -64,6 +64,7 @@ local new = function(id, clean_session)
                        POLL_INTERVAL = 0.0,
 
                        mqtt = mqtt,
+                       lib_destroy = mqtt_driver.lib_destroy,
                        connected = false,
                        auto_reconect = true,
                        fiber = nil,
@@ -105,6 +106,7 @@ mqtt_mt = {
     __io_loop = function(self)
       local mq = self.mqtt
       while true do
+        fiber.testcancel()
         self.connected, _ = mq:io_run_one()
         if not self.connected then
           if self.auto_reconect then
@@ -467,6 +469,7 @@ mqtt_mt = {
     -- Destroy (i.e. free) self
     --
     destroy = function(self)
+      self.fiber:cancel()
       local ok, emsg = self.mqtt:destroy()
       self = nil
       return ok, emsg

@@ -13,6 +13,7 @@ Key features
 ----------
 * [Compilation and install](#compilation-and-install)
 * [API](#api)
+  * [lib_destroy](#lib_destroy)
   * [new](#new)
   * [connect](#connect)
   * [reconnect](#reconnect)
@@ -52,6 +53,27 @@ $ make -C build
 ------
 
 Lua API documentation
+
+### lib_destroy
+---------------
+
+  Cleanup everithing.
+  Note. you have to call it manually, the module does not use lua's GC.
+  Do not call this untill you call `destroy` for each mqtt object.
+
+  Parameters:
+    None
+
+  Returns:
+    None
+
+```lua
+  mqtt = require('mqtt')
+  instance = mqtt.new("client_id", true)
+  mqtt.lib_destroy()
+```
+
+[Back to content](#content)
 
 ### new
 -------
@@ -194,6 +216,7 @@ Lua API documentation
 -----------
 
   destroy a mqtt object
+  Note. you have to call it manually, the module does not use lua's GC.
 
   Parameters:
     None
