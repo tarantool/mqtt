@@ -1,3 +1,10 @@
+ -- Vasiliy Soshnikov <dedok.mad@gmail.com>  Sun, 8 Jul 2018 16:23:00 +0300
+tarantool-mqtt (1.4.0-1) stable; urgency=medium
+  * Fixed: https://github.com/tarantool/mqtt/issues/14
+  * Fixed: https://github.com/tarantool/mqtt/issues/12
+  * Fixed: https://github.com/tarantool/mqtt/issues/11
+  * Fixed: https://github.com/tarantool/mqtt/issues/9
+
 tarantool-mqtt (1.2.0-1) stable; urgency=medium
   * Build issue have been fixed.
 

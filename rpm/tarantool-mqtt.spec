@@ -1,5 +1,5 @@
 Name: tarantool-mqtt
-Version: 1.3
+Version: 1.4
 Release: 1%{?dist}
 Summary: Tarantool MQTT module
 Group: Applications/Databases
@@ -39,6 +39,9 @@ make -j2 test
 %license LICENSE
 
 %changelog
+* Mon Jul 9 2018 V. Soshnikov <dedok.mad@gmail.com> 1.4.0
+- Fixed: https://github.com/tarantool/mqtt/issues/14
+
 * Mon May 28 2018 V. Soshnikov <dedok.mad@gmail.com> 1.3.0
 - Fixed: https://github.com/tarantool/mqtt/issues/12
 - Fixed: https://github.com/tarantool/mqtt/issues/11

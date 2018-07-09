@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2016 Tarantool AUTHORS: please see AUTHORS file.
+--  Copyright (C) 2016 - 2018 Tarantool AUTHORS: please see AUTHORS file.
 --
 --  Redistribution and use in source and binary forms, with or
 --  without modification, are permitted provided that the following
@@ -463,6 +463,9 @@ mqtt_mt = {
       return self.mqtt:callback_set(mqtt_driver.MESSAGE, F)
     end,
 
+    --
+    -- Destroy (i.e. free) self
+    --
     destroy = function(self)
       return self.mqtt:destroy()
     end,

@@ -18,6 +18,7 @@ Key features
   * [reconnect](#reconnect)
   * [subscribe](#subscribe)
   * [unsubscribe](#unsubscribe)
+  * [destroy](#destroy)
   * [publish](#publish)
   * [will_set](#will_set)
   * [will_clear](#will_clear)
@@ -182,6 +183,28 @@ Lua API documentation
   instance = mqtt.new("client_id", true)
   -- Cut, see [connect](#connect)
   ok, err = instance:unsubscribe('my/topic/#')
+  if ok then
+    print(ok, err)
+  end
+```
+
+[Back to content](#content)
+
+### destroy
+-----------
+
+  destroy a mqtt object
+
+  Parameters:
+    None
+  Returns:
+    true or false, error message
+
+```lua
+  mqtt = require('mqtt')
+  instance = mqtt.new("client_id", true)
+  -- Cut, see [connect](#connect)
+  ok, err = instance:destroy()
   if ok then
     print(ok, err)
   end
