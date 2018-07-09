@@ -239,6 +239,7 @@ mosq_destroy(lua_State *L)
 
     if (ctx->mosq)
         mosquitto_destroy(ctx->mosq);
+
     ctx->mosq = NULL;
 
     luaL_unref(ctx->L, LUA_REGISTRYINDEX, ctx->connect_ref);
@@ -421,6 +422,8 @@ mosq_connect_f(struct mosquitto *mosq __attribute__((unused)),
         void *obj, int rc)
 {
     mosq_t *ctx = obj;
+    if (!ctx || !ctx->mosq)
+        return;
     enum connect_return_codes return_code = rc;
 
     bool success = false;
@@ -475,6 +478,8 @@ mosq_disconnect_f(struct mosquitto *mosq __attribute__((unused)),
         void *obj, int rc)
 {
     mosq_t *ctx = obj;
+    if (!ctx || !ctx->mosq)
+        return;
     bool success = true;
     char *str = "client-initiated disconnect";
 
@@ -500,6 +505,8 @@ mosq_publish_f(struct mosquitto *mosq __attribute__((unused)),
         void *obj, int mid)
 {
     mosq_t *ctx = obj;
+    if (!ctx || !ctx->mosq)
+        return;
     lua_rawgeti(ctx->L, LUA_REGISTRYINDEX, ctx->publish_ref);
     lua_pushinteger(ctx->L, mid);
     if (lua_pcall(ctx->L, 1, 0, 0) != LUA_OK)
@@ -513,6 +520,8 @@ mosq_message_f(struct mosquitto *mosq __attribute__((unused)),
         void *obj, const struct mosquitto_message *msg)
 {
     mosq_t *ctx = obj;
+    if (!ctx || !ctx->mosq)
+        return;
     lua_rawgeti(ctx->L, LUA_REGISTRYINDEX, ctx->message_ref);
 
     /**
@@ -534,6 +543,8 @@ mosq_subscribe_f(struct mosquitto *mosq __attribute__((unused)),
         void *obj, int mid, int qos_count, const int *granted_qos)
 {
     mosq_t *ctx = obj;
+    if (!ctx || !ctx->mosq)
+        return;
     lua_rawgeti(ctx->L, LUA_REGISTRYINDEX, ctx->subscribe_ref);
     lua_pushinteger(ctx->L, mid);
     for (int i = 0; i < qos_count; i++)
@@ -548,6 +559,8 @@ mosq_unsubscribe_f(struct mosquitto *mosq __attribute__((unused)),
         void *obj, int mid)
 {
     mosq_t *ctx = obj;
+    if (!ctx || !ctx->mosq)
+        return;
     lua_rawgeti(ctx->L, LUA_REGISTRYINDEX, ctx->unsubscribe_ref);
     lua_pushinteger(ctx->L, mid);
     if (lua_pcall(ctx->L, 1, 0, 0) != LUA_OK)
@@ -560,6 +573,8 @@ mosq_log_f(struct mosquitto *mosq __attribute__((unused)),
         void *obj, int level, const char *message)
 {
     mosq_t *ctx = obj;
+    if (!ctx || !ctx->mosq)
+        return;
     if (ctx->log_level_mask & level) {
         lua_rawgeti(ctx->L, LUA_REGISTRYINDEX, ctx->log_ref);
         lua_pushinteger(ctx->L, level);

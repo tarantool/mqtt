@@ -467,7 +467,9 @@ mqtt_mt = {
     -- Destroy (i.e. free) self
     --
     destroy = function(self)
-      return self.mqtt:destroy()
+      local ok, emsg = self.mqtt:destroy()
+      self = nil
+      return ok, emsg
     end,
   },
 }
