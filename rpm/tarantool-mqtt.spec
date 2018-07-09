@@ -1,5 +1,5 @@
 Name: tarantool-mqtt
-Version: 1.4
+Version: 1.4.0
 Release: 1%{?dist}
 Summary: Tarantool MQTT module
 Group: Applications/Databases
