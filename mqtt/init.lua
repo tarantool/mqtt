@@ -462,6 +462,10 @@ mqtt_mt = {
     on_message = function(self, F)
       return self.mqtt:callback_set(mqtt_driver.MESSAGE, F)
     end,
+
+    destroy = function(self)
+      return self.mqtt:destroy()
+    end,
   },
 }
 

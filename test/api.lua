@@ -40,7 +40,6 @@ end
 local conn = mqtt.new()
 
 assert(type(conn.VERSION) == 'string')
-assert(#conn.VERSION > 5)
 
 F(conn:on_connect(function(success, ret_code, message)
   if not success then
@@ -122,5 +121,8 @@ assert(stat['channel/in_2_data_1'] ~= nil)
 assert(stat['channel/in_2_data_2'] ~= nil)
 
 print ("[+] Done")
+
+F(conn:destroy())
+F(conn:destroy())
 
 os.exit(0)
