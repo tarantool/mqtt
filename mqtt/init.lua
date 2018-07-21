@@ -469,7 +469,9 @@ mqtt_mt = {
     -- Destroy (i.e. free) self
     --
     destroy = function(self)
-      self.fiber:cancel()
+      if (self.fiber ~= nil and self.fiber.cancel ~= nil) then
+        self.fiber:cancel()
+      end
       local ok, emsg = self.mqtt:destroy()
       self = nil
       return ok, emsg
