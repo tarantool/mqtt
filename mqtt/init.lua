@@ -491,7 +491,9 @@ mqtt_mt = {
       if type(self) ~= 'table' or self.mqtt == nil then
         error("mqtt: usage: mqtt:destroy()")
       end
-      self.fiber:cancel()
+      if (self.fiber ~= nil and self.fiber.cancel ~= nil) then
+        self.fiber:cancel()
+      end
       local ok, emsg = self.mqtt:destroy()
       self = nil
       return ok, emsg
