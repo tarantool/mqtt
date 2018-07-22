@@ -161,6 +161,10 @@ mqtt_mt = {
     --  true or false, emsg
     --
     connect = function(self, opts_)
+      
+      if type(self) ~= 'table' or self.mqtt == nil then
+        error("mqtt: usage: mqtt:connect()")
+      end
 
       local opts = opts_ or {}
 
@@ -196,6 +200,9 @@ mqtt_mt = {
     --    <connect> <opts.auto_reconect>
     --
     reconnect = function(self)
+      if type(self) ~= 'table' or self.mqtt == nil then
+        error("mqtt: usage: mqtt:reconnect()")
+      end
       return self.mqtt:reconnect()
     end,
 
@@ -210,6 +217,9 @@ mqtt_mt = {
     --  true or false, integer mid or error message
     --
     subscribe = function(self, topic, qos)
+      if type(self) ~= 'table' or self.mqtt == nil then
+        error("mqtt: usage: mqtt:subscribe()")
+      end
       local ok, mid_or_emsg = self.mqtt:subscribe(topic, qos)
       if ok then
         self.subscribers[topic] = {qos = qos}
@@ -227,6 +237,9 @@ mqtt_mt = {
     --  true or false, integer mid or error message
     --
     unsubscribe = function(self, topic)
+      if type(self) ~= 'table' or self.mqtt == nil then
+        error("mqtt: usage: mqtt:unsubscribe()")
+      end
       local ok, emsg = self.mqtt:unsubscribe(topic)
       self.subscribers[topic] = nil
       return ok, emsg
@@ -249,6 +262,9 @@ mqtt_mt = {
     --   true or false, emsg, message id(e.g. MID) is referenced in the publish callback
     --
     publish = function(self, topic, payload, qos, retail)
+      if type(self) ~= 'table' or self.mqtt == nil then
+        error("mqtt: usage: mqtt:publish()")
+      end
       local raw_payload = payload
       if type(payload) == 'table' then
         raw_payload = json.encode(payload)
@@ -305,6 +321,9 @@ mqtt_mt = {
     --  true or false, emsg
     --
     login_set = function(self, username, password)
+      if type(self) ~= 'table' or self.mqtt == nil then
+        error("mqtt: usage: mqtt:login_set()")
+      end
       return self.mqtt:login_set(username, password)
     end,
 
@@ -469,6 +488,9 @@ mqtt_mt = {
     -- Destroy (i.e. free) self
     --
     destroy = function(self)
+      if type(self) ~= 'table' or self.mqtt == nil then
+        error("mqtt: usage: mqtt:destroy()")
+      end
       if (self.fiber ~= nil and self.fiber.cancel ~= nil) then
         self.fiber:cancel()
       end
