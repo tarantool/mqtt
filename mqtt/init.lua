@@ -107,7 +107,7 @@ mqtt_mt = {
       local mq = self.mqtt
       while true do
         fiber.testcancel()
-        self.connected, _ = mq:io_run_one()
+        self.connected = mq:io_run_one()
         if not self.connected then
           if self.auto_reconect then
             self:__reconnect()
