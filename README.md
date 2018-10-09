@@ -4,14 +4,17 @@
 
 # Tarantool MQTT client
 ---------------------------------
-Key features
-* allows to create communication with MQTT broker in non-blocking way
-* TLS supported
-* pretty low overheads, code based on libmosquitto
+
+Key features:
+
+* non-blocking communication with MQTT brokers;
+* TLS support;
+* pretty low overheads, code based on `libmosquitto`.
 
 ## Content
 ----------
-* [Compilation and install](#compilation-and-install)
+* [Prerequisites](#prerequisites)
+* [Building from source](#building-from-source)
 * [API](#api)
   * [lib_destroy](#lib_destroy)
   * [new](#new)
@@ -33,11 +36,14 @@ Key features
 * [Copyright & License](#copyright--license)
 * [See also](#see-also)
 
-## Compilation and install
---------------------------
-  Before reading any further, make sure, you have installed MQTT broker
+## Prerequisites
+-------------------------------
 
-### Build from source
+  Before reading any further, make sure you have an MQTT broker installed.
+
+### Building from source
+
+Clone the repository with submodules, bootstrap, and build the client:
 
 ```bash
 $ git clone https://github.com/tarantool/mqtt.git
@@ -57,15 +63,20 @@ Lua API documentation
 ### lib_destroy
 ---------------
 
-  Cleanup everithing.
-  Note. you have to call it manually, the module does not use lua's GC.
-  Do not call this untill you call `destroy` for each mqtt object.
+  Cleanup everything.
+
+  Note: The module does not use the Lua's GC and have to be called manually. 
+  To call it manually, first call `destroy` on each `mqtt` object.
 
   Parameters:
+
     None
 
   Returns:
+
     None
+
+  Example:
 
 ```lua
   mqtt = require('mqtt')
@@ -78,23 +89,27 @@ Lua API documentation
 ### new
 -------
 
-  Create a new mosquitto client instance.
+  Create a new `mosquitto` client instance.
 
   Parameters:
-  	id -            String to use as the client id. If NULL, a random client id
-  	                will be generated. If id is NULL, clean_session must be true.
-  	clean_session - set to true to instruct the broker to clean all messages
-                   and subscriptions on disconnect, false to instruct it to
-                   keep them. See the man page mqtt(7) for more details.
-                   Note that a client will never discard its own outgoing
-                   messages on disconnect. Calling (connect)[#connect] or
-                   (reconnect)[#reconnect] will cause the messages to be resent.
-                   Use [reinitialise](#reinitialise) to reset a client to its
-                   original state.
-                   Must be set to true if the id parameter is NULL.
+
+    client_id       - String. If NULL, a random client id will be generated 
+                      and the clean_session parameter must be set to true.
+    clean_session   - Boolean. Set to true to instruct the broker to clean all 
+                      messages and subscriptions on disconnect; false to instruct 
+                      it to keep them. See the man page mqtt(7) for more details.
+                      Note that a client will never discard its own outgoing
+                      messages on disconnect. Calling (connect)[#connect] or
+                      (reconnect)[#reconnect] will resend the messages.
+                      Use [reinitialise](#reinitialise) to reset the client to its
+                      original state.
+                      Must be set to true if the id parameter is NULL.
 
   Returns:
-     mqtt object(see mqtt_mt) or raise error
+
+     mqtt object (see mqtt_mt) or raises error
+
+  Example:
 
 ```lua
   mqtt = require('mqtt')
@@ -109,17 +124,20 @@ Lua API documentation
   Connect to an MQTT broker.
 
   Parameters:
-    opts.host          - the hostname or ip address of the broker to connect to.
-    opts.port          - the network port to connect to. Usually 1883.
-    opts.keepalive     - the number of seconds after which the broker should send a PING
-                         message to the client if no other messages have been exchanged
-                         in that time.
+
+    opts.host          - Hostname or IP address of the broker to connect to.
+    opts.port          - Network port to connect to. Usually 1883.
+    opts.keepalive     - The number of seconds the broker waits since the last 
+                         message before sending a PING message to the client.
     opts.log_mask      - LOG_NONE, LOG_INFO, LOG_NOTICE, LOG_WARNING,
-                         LOG_ERROR[default], LOG_DEBUG, LOG_ALL
-    opts.auto_reconect - true[default], false - auto reconnect on, off
+                         LOG_ERROR[default], LOG_DEBUG, LOG_ALL.
+    opts.auto_reconect - [true|false] - auto reconnect on (default) or off.
 
   Returns:
+
     true or false, emsg
+
+  Example:
 
 ```lua
   mqtt = require('mqtt')
@@ -137,25 +155,23 @@ Lua API documentation
 ### reconnect
 -------------
 
-  Reconnect to a broker.
+  Reconnect to broker.
 
-    This function provides an easy way of reconnecting to a broker after a
-    connection has been lost. It uses the values that were provided in the
-    [connect](#connect) call. It must not be called before
-    [connect](#connect).
+  This function provides an easy way of reconnecting to the broker after
+  connection loss. It uses the values provided in the [connect](#connect) 
+  call and must not be called prior.
 
-  NOTE
-    After reconnecting you must call [subscribe](#subscribe) for subscribing
-    to a topics.
+  Note: After the reconnection you must call [subscribe](#subscribe) to 
+  subscribe to topics.
 
-  See
-    [connect](#connect) <opts.auto_reconect>
+  See the [connect](#connect) `opts.auto_reconect` parameter.
+
+  Example:
 
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
   instance:connect({host='127.0.0.1', port=1883, auto_reconect=false})
-
   ok, emsg_or_mid = instance:subscribe('topic')
   if not ok and not mqtt.connect then
     print('subscribe - failed, reconnecting ...')
@@ -171,11 +187,15 @@ Lua API documentation
   Subscribe to a topic.
 
   Parameters:
-    sub -  the subscription pattern.
-    qos -  the requested Quality of Service for this subscription.
+
+    sub -  Subscription pattern.
+    qos -  Requested Quality of Service for this subscription.
 
   Returns:
+
     true or false, integer mid or error message
+
+  Example:
 
 ```lua
   mqtt = require('mqtt')
@@ -195,10 +215,14 @@ Lua API documentation
   Unsubscribe from a topic.
 
   Parameters:
-    topic - the unsubscription pattern.
+
+    topic - Unsubscription pattern.
 
   Returns:
+
     true or false, integer mid or error message
+
+  Example:
 
 ```lua
   mqtt = require('mqtt')
@@ -215,13 +239,19 @@ Lua API documentation
 ### destroy
 -----------
 
-  destroy a mqtt object
-  Note. you have to call it manually, the module does not use lua's GC.
+  Destroy an `mqtt` object.
+
+  Note: Call this function manually as the module does not use the Lua's GC.
 
   Parameters:
+
     None
+
   Returns:
+
     true or false, error message
+
+  Example:
 
 ```lua
   mqtt = require('mqtt')
@@ -241,17 +271,21 @@ Lua API documentation
   Publish a message on a given topic.
 
   Parameters:
-    topic -      null terminated string of the topic to publish to.
- 	  payload -    pointer to the data to send.
- 	  qos -        integer value 0, 1 or 2 indicating the Quality of Service to be
-                 used for the message.When you call the library as "mqtt = require('mqtt')"
-                 can be used mqtt.QOS_0, mqtt.QOS_1 and mqtt.QOS_2 as a replacement for some strange
-                 digital variable
- 	  retain -     set to true to make the message retained. You can also use the values
-                 mqtt.RETAIN and mqtt.NON_RETAIN to replace the unmarked variable
+
+    topic      - Null-terminated string of the topic to publish to.
+    payload    - Pointer to the data to send.
+    qos        - Integer value 0, 1 or 2 indicating the Quality of Service to be
+                 used for the message. When you call the library with "mqtt = require('mqtt')",
+                 you can use mqtt.QOS_0, mqtt.QOS_1 and mqtt.QOS_2 as a replacement 
+                 for some strange digital variable.
+    retain     - Set to true to make the message retained. You can also use the values
+                 mqtt.RETAIN and mqtt.NON_RETAIN to replace the unmarked variable.
 
   Returns:
-    true or false, emsg, message id(e.g. MID) is referenced in the publish callback
+
+    true or false, emsg, message id (i.e. MID) is referenced in the publish callback
+
+  Example:
 
 ```lua
   mqtt = require('mqtt')
@@ -268,18 +302,22 @@ Lua API documentation
 ### will_set
 ------------
 
-  Configure will information for a mosquitto instance. By default, clients do
-  not have a will.  This must be called before calling [connect](#connect).
+  Configure the `will` information for a `mosquitto` instance. By default, clients do
+  not have a `will`. Must be called before calling [connect](#connect).
 
   Parameters:
-  	topic -      the topic on which to publish the will.
-  	payload -    pointer to the data to send.
-  	qos -        integer value 0, 1 or 2 indicating the Quality of Service to be
-                used for the will.
-  	retain -     set to true to make the will a retained message.
+
+    topic      - Topic for which to publish the will.
+    payload    - Pointer to the data to send.
+    qos        - Integer value 0, 1 or 2 indicating the Quality of Service to be
+                 used for the will.
+    retain     - Set to true to make the will a retained message.
 
   Returns:
-   true or false, emsg
+
+    true or false, emsg
+
+  Example:
 
 ```lua
   mqtt = require('mqtt')
@@ -296,11 +334,14 @@ Lua API documentation
 ### will_clear
 --------------
 
-  Remove a previously configured will. This must be called before calling
+  Remove a previously configured `will`. Must be called before calling
   [connect](#connect).
 
   Returns:
+
     true or false, emsg
+
+  Example:
 
 ```lua
   mqtt = require('mqtt')
@@ -317,23 +358,24 @@ Lua API documentation
 ### login_set
 -------------
 
-  Configure username and password for a mosquitton instance. This is only
-  supported by brokers that implement the MQTT spec v3.1. By default, no
-  username or password will be sent.
-  If username is NULL, the password argument is ignored.
-  This must be called before calling connect.
+  Configure a username and password for the `mosquitto` instance. Supported only by 
+  the brokers that implement the MQTT spec v3.1. By default, no username 
+  or password will be sent. If the username is NULL, the password argument is ignored.
 
-  This is must be called before calling [connect](#connect).
+  Must be called before calling [connect](#connect).
 
   Parameters:
-  	username - the username to send as a string, or NULL to disable
-              authentication.
-  	password - the password to send as a string. Set to NULL when username is
-  	           valid in order to send just a username.
+
+    username - Username to send as a string or NULL to disable
+               authentication.
+    password - Password to send as a string. Set to NULL to send 
+               just a valid username.
 
   Returns:
-   true or false, emsg
 
+    true or false, emsg
+
+  Example:
 
 ```lua
   mqtt = require('mqtt')
@@ -350,23 +392,27 @@ Lua API documentation
 ### tls_insecure_set
 --------------------
 
-  Configure verification of the server hostname in the server certificate. If
-  value is set to true, it is impossible to guarantee that the host you are
-  connecting to is not impersonating your server. This can be useful in
-  initial server testing, but makes it possible for a malicious third party to
-  impersonate your server through DNS spoofing, for example.
-  Do not use this function in a real system. Setting value to true makes the
-  connection encryption pointless.
+  Configure server hostname verification in the server certificate. If the 
+  `value` parameter is set to `true`, connection encryption is pointless and 
+  it is impossible to guarantee that the host you are connecting to is not 
+  impersonating your server. This can be useful during the initial server 
+  testing but makes it possible for a malicious third party to impersonate 
+  your server through, e.g., DNS spoofing.
+
+  Do not use this function in a production environment. 
+
   Must be called before [connect](#connect).
 
   Parameters:
-   value - if set to false, the default, certificate hostname checking is
-           performed. If set to true, no hostname checking is performed and
-           the connection is insecure.
+
+    value - If set to false (default), certificate hostname is checked. 
+            If set to true, no checking is performed and connection is insecure.
 
   Returns:
-   true or false, emsg
 
+    true or false, emsg
+
+  Example:
 
 ```lua
   mqtt = require('mqtt')
@@ -383,37 +429,40 @@ Lua API documentation
 ### tls_set
 -----------
 
-  Configure the client for certificate based SSL/TLS support. Must be called
+  Configure a client for certificate-based SSL/TLS support. Must be called
   before [connect](#connect).
 
-  Define the Certificate Authority certificates to be trusted (ie. the server
-  certificate must be signed with one of these certificates) using cafile.
+  Define certificates signed by a Certificate Authority (CA) as trusted 
+  (i.e. the server certificate must be signed by it) using `cafile`.
 
-  If the server you are connecting to requires clients to provide a
-  certificate, define certfile and keyfile with your client certificate and
-  private key. If your private key is encrypted, provide a password callback
-  function or you will have to enter the password at the command line.
+  If the server to connect to requires clients to provide a certificate, 
+  set the `certfile` and `keyfile` paths to your client certificate 
+  and private key files. If the private key is encrypted, provide a password 
+  callback function or enter the password via the command line.
 
   Parameters:
-   cafile -      path to a file containing the PEM encoded trusted CA
-                 certificate files. Either cafile or capath must not be NULL.
-   capath -      path to a directory containing the PEM encoded trusted CA
-                 certificate files. See mosquitto.conf for more details on
-                 configuring this directory. Either cafile or capath must not
-                 be NULL.
-   certfile -    path to a file containing the PEM encoded certificate file
-                 for this client. If NULL, keyfile must also be NULL and no
-                 client certificate will be used.
-   keyfile -     path to a file containing the PEM encoded private key for
-                 this client. If NULL, certfile must also be NULL and no
-                 client certificate will be used.
-   pw_callback - TODO Implement me
+
+    cafile      - Path to a file containing PEM-encoded trusted CA
+                  certificate. Either the cafile or capath must not be NULL.
+    capath      - Path to a directory containing the PEM-encoded trusted CA
+                  certificate files. See mosquitto.conf for more details on
+                  configuring this directory. Either the cafile or capath must 
+                  not be NULL.
+    certfile    - Path to a file containing a PEM-encoded certificate
+                  for this client. If NULL, the keyfile must also be NULL and no
+                  client certificate will be used.
+    keyfile     - Path to a file containing a PEM-encoded private key for
+                  this client. If NULL, the certfile must also be NULL and no
+                  client certificate will be used.
+    pw_callback - TODO: implement me.
 
   Returns:
-   true or false, emsg
 
-  See Also:
-   [tls_insecure_set](#tls_insecure_set)
+    true or false, emsg
+
+  See also: [tls_insecure_set](#tls_insecure_set).
+
+  Example:
 
 ```lua
   mqtt = require('mqtt')
@@ -429,15 +478,19 @@ Lua API documentation
 
 ### on_message
 
-  Set the message callback. This is called when a message is received
-  from the broker.
+  Set a message callback. Called when a message from the broker 
+  is received.
 
   Parameters:
-   F - a callback function in the following form:
-       function F(integer_mid, string_topic, string_payload, integer_gos, integer_retain)
+
+    F - a callback function with the following form:
+        function F(integer_mid, string_topic, string_payload, integer_gos, integer_retain)
 
   Returns:
-   true or false, emsg
+
+    true or false, emsg
+
+  Example:
 
 ```lua
   mqtt = require('mqtt')
@@ -455,42 +508,44 @@ Lua API documentation
 
 [Back to content](#content)
 
-### Subscribe on events
-----------------------
-NOTE
-    Basically, you don't need those functions, so use them with caution.
-    Incorrect uses of following functions might break async I/O loop!
+### Subscribe to events
+-----------------------
 
-    * on_connect
+  Warning: Use the following functions with caution as 
+  incorrect calls can break asynchronous I/O loops!
 
-    * on_disconnect
+  Non-mandatory functions:
 
-    * on_publish
+  * on_connect
 
-    * on_subscribe
+  * on_disconnect
 
-    * on_unsubscribe
+  * on_publish
 
-    You can find Detailed documentation of those functions at file: mqtt/init.lua
+  * on_subscribe
+
+  * on_unsubscribe
+
+  See the detailed documentation of these functions in the [mqqt.init.lua](../mqqt/init.lua) file.
 
 [Back to content](#content)
 
 ## Performance tuning
 ---------------------
 
+TODO: describe me.
+
 [Back to content](#content)
 
 ## Examples
 -----------
 
-  Connecting to the MQTT broker
-    * examples/connect.lua
+  The [examples/connect.lua](../examples/connect.lua) file shows how to connect 
+  to an MQTT broker.
 
-  Tarantool produces data then passes it to MQTT broker via MQTT connector
-  in non-blocking way.
-  Also, Tarantool consumes data from the MQTT broker via MQTT connector
-  in non-blocking way.
-    * examples/producer_consumer_queue.lua
+  The [examples/producer_consumer_queue.lua](../examples/producer_consumer_queue.lua) file shows how 
+  Tarantool produces, passes, and consumes data to and from an MQTT broker 
+  via the MQTT connector in a non-blocking way.
 
 [Back to content](#content)
 
@@ -500,16 +555,17 @@ NOTE
 
 [Back to content](#content)
 
-##See also
+## See also
 ----------
 * [Tarantool](http://tarantool.org) homepage.
-* MQTT brokers
+* MQTT brokers:
   * [Mosquitto](https://mosquitto.org) homepage.
   * [RabbitMQ](https://www.rabbitmq.com) homepage.
 
 [Back to content](#content)
 
-================
+---
+
 Please report bugs at https://github.com/tarantool/mqtt/issues.
 
-We also warmly welcome your feedback in the discussion mailing list, tarantool@googlegroups.com.
+We also warmly welcome your feedback in the discussion mailing list: tarantool@googlegroups.com.
