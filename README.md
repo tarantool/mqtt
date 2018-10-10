@@ -528,7 +528,7 @@ Lua API documentation
 
   * on_unsubscribe
 
-  See the detailed documentation of these functions in the [mqtt.init.lua](../blob/master/mqtt/init.lua) file.
+  See the detailed documentation of these functions in the [mqtt.init.lua](../master/mqtt/init.lua) file.
 
 [Back to content](#content)
 
@@ -542,10 +542,10 @@ TODO: describe me.
 ## Examples
 -----------
 
-  The [examples/connect.lua](../blob/master/examples/connect.lua) file shows how to connect 
+  The [examples/connect.lua](../master/examples/connect.lua) file shows how to connect 
   to an MQTT broker.
 
-  The [examples/producer_consumer_queue.lua](../blob/master/examples/producer_consumer_queue.lua) file shows how 
+  The [examples/producer_consumer_queue.lua](../blob/examples/producer_consumer_queue.lua) file shows how 
   Tarantool produces, passes, and consumes data to and from an MQTT broker 
   via the MQTT connector in a non-blocking way.
 
