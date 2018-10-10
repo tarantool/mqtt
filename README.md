@@ -65,7 +65,7 @@ Lua API documentation
 
   Cleanup everything.
 
-  Note: The module does not use the Lua's GC and have to be called manually. 
+  Note: The module does not use the Lua's GC and has to be called manually. 
   To call it manually, first call `destroy` on each `mqtt` object.
 
   Parameters:
@@ -392,12 +392,14 @@ Lua API documentation
 ### tls_insecure_set
 --------------------
 
-  Configure server hostname verification in the server certificate. If the 
-  `value` parameter is set to `true`, connection encryption is pointless and 
+  If set to `true`, do not check if the hostname in the server's certificate 
+  matches the hostname of the server to connect to.
+
+  If the check is disabled, connection encryption is pointless and 
   it is impossible to guarantee that the host you are connecting to is not 
   impersonating your server. This can be useful during the initial server 
   testing but makes it possible for a malicious third party to impersonate 
-  your server through, e.g., DNS spoofing.
+  the server through, e.g., DNS spoofing.
 
   Do not use this function in a production environment. 
 
@@ -526,7 +528,7 @@ Lua API documentation
 
   * on_unsubscribe
 
-  See the detailed documentation of these functions in the [mqqt.init.lua](../mqqt/init.lua) file.
+  See the detailed documentation of these functions in the [mqtt.init.lua](../blob/master/mqtt/init.lua) file.
 
 [Back to content](#content)
 
@@ -540,10 +542,10 @@ TODO: describe me.
 ## Examples
 -----------
 
-  The [examples/connect.lua](../examples/connect.lua) file shows how to connect 
+  The [examples/connect.lua](../blob/master/examples/connect.lua) file shows how to connect 
   to an MQTT broker.
 
-  The [examples/producer_consumer_queue.lua](../examples/producer_consumer_queue.lua) file shows how 
+  The [examples/producer_consumer_queue.lua](../blob/master/examples/producer_consumer_queue.lua) file shows how 
   Tarantool produces, passes, and consumes data to and from an MQTT broker 
   via the MQTT connector in a non-blocking way.
 
@@ -557,7 +559,7 @@ TODO: describe me.
 
 ## See also
 ----------
-* [Tarantool](http://tarantool.org) homepage.
+* [Tarantool](https://www.tarantool.io) homepage.
 * MQTT brokers:
   * [Mosquitto](https://mosquitto.org) homepage.
   * [RabbitMQ](https://www.rabbitmq.com) homepage.
