@@ -65,8 +65,8 @@ Lua API documentation
 
   Cleanup everything.
 
-  Note: The module does not use the Lua's GC and has to be called manually. 
-  To call it manually, first call `destroy` on each `mqtt` object.
+  Note: The module does not use the Lua's GC, the latter has to be called 
+  manually. To call it manually, first call `destroy` on each `mqtt` object.
 
   Parameters:
 
@@ -397,7 +397,7 @@ Lua API documentation
 
   If the check is disabled, connection encryption is pointless and 
   it is impossible to guarantee that the host you are connecting to is not 
-  impersonating your server. This can be useful during the initial server 
+  impersonating the server. This can be useful during the initial server 
   testing but makes it possible for a malicious third party to impersonate 
   the server through, e.g., DNS spoofing.
 
@@ -528,7 +528,7 @@ Lua API documentation
 
   * on_unsubscribe
 
-  See the detailed documentation of these functions in the [mqtt.init.lua](../master/mqtt/init.lua) file.
+  See the detailed documentation of these functions in the [mqtt.init.lua](/mqtt/init.lua) file.
 
 [Back to content](#content)
 
@@ -542,10 +542,10 @@ TODO: describe me.
 ## Examples
 -----------
 
-  The [examples/connect.lua](../master/examples/connect.lua) file shows how to connect 
+  The [examples/connect.lua](/examples/connect.lua) file shows how to connect 
   to an MQTT broker.
 
-  The [examples/producer_consumer_queue.lua](../master/examples/producer_consumer_queue.lua) file shows how 
+  The [examples/producer_consumer_queue.lua](/examples/producer_consumer_queue.lua) file shows how 
   Tarantool produces, passes, and consumes data to and from an MQTT broker 
   via the MQTT connector in a non-blocking way.
 
