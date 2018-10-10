@@ -55,7 +55,7 @@ $ make -C build
 
 [Back to content](#content)
 
-## Api
+## API
 ------
 
 Lua API documentation
