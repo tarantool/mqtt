@@ -76,7 +76,6 @@ Lua API documentation.
 
 Note that a client will never discard its own outgoing messages on disconnect. 
 Calling [connect](#connect) or [reconnect](#reconnect) will resend the messages.
-Use the `reinitialise` function to reset the client to its original state.
 
   Returns:
 
