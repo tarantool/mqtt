@@ -55,36 +55,10 @@ $ make -C build
 
 [Back to content](#content)
 
-## Api
+## API
 ------
 
-Lua API documentation
-
-### lib_destroy
----------------
-
-  Cleanup everything.
-
-  Note: The module does not use the Lua's GC and have to be called manually. 
-  To call it manually, first call `destroy` on each `mqtt` object.
-
-  Parameters:
-
-    None
-
-  Returns:
-
-    None
-
-  Example:
-
-```lua
-  mqtt = require('mqtt')
-  instance = mqtt.new("client_id", true)
-  mqtt.lib_destroy()
-```
-
-[Back to content](#content)
+Lua API documentation.
 
 ### new
 -------
@@ -98,12 +72,11 @@ Lua API documentation
     clean_session   - Boolean. Set to true to instruct the broker to clean all 
                       messages and subscriptions on disconnect; false to instruct 
                       it to keep them. See the man page mqtt(7) for more details.
-                      Note that a client will never discard its own outgoing
-                      messages on disconnect. Calling (connect)[#connect] or
-                      (reconnect)[#reconnect] will resend the messages.
-                      Use [reinitialise](#reinitialise) to reset the client to its
-                      original state.
                       Must be set to true if the id parameter is NULL.
+
+Note that a client will never discard its own outgoing messages on disconnect. 
+Calling [connect](#connect) or [reconnect](#reconnect) will resend the messages.
+Use the `reinitialise` function to reset the client to its original state.
 
   Returns:
 
@@ -200,7 +173,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err_or_mid = instance:subscribe('my/topic/#', 1)
   if ok then
     print(ok, err_or_mid)
@@ -227,7 +200,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:unsubscribe('my/topic/#')
   if ok then
     print(ok, err)
@@ -256,11 +229,37 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:destroy()
   if ok then
     print(ok, err)
   end
+```
+
+[Back to content](#content)
+
+### lib_destroy
+---------------
+
+  Cleanup everything.
+
+  Note: The module does not use the Lua's GC, the latter has to be called 
+  manually. To call it manually, first call `destroy` on each `mqtt` object.
+
+  Parameters:
+
+    None
+
+  Returns:
+
+    None
+
+  Example:
+
+```lua
+  mqtt = require('mqtt')
+  instance = mqtt.new("client_id", true)
+  mqtt.lib_destroy()
 ```
 
 [Back to content](#content)
@@ -290,7 +289,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:publish('my/topic/#', 'Some payload as string', mqtt.QOS_0, mqtt.RETAIN)
   if ok then
     print(ok, err)
@@ -322,7 +321,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:will_set('my/topic/#', 'Some payload as string', 0, true)
   if ok then
     print(ok, err)
@@ -346,7 +345,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:will_clear()
   if ok then
     print(ok, err)
@@ -380,7 +379,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:login_set('user', 'password')
   if ok then
     print(ok, err)
@@ -392,12 +391,14 @@ Lua API documentation
 ### tls_insecure_set
 --------------------
 
-  Configure server hostname verification in the server certificate. If the 
-  `value` parameter is set to `true`, connection encryption is pointless and 
+  If set to `true`, do not check if the hostname in the server's certificate 
+  matches the hostname of the server to connect to.
+
+  If the check is disabled, connection encryption is pointless and 
   it is impossible to guarantee that the host you are connecting to is not 
-  impersonating your server. This can be useful during the initial server 
+  impersonating the server. This can be useful during the initial server 
   testing but makes it possible for a malicious third party to impersonate 
-  your server through, e.g., DNS spoofing.
+  the server through, e.g., DNS spoofing.
 
   Do not use this function in a production environment. 
 
@@ -417,7 +418,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:tls_insecure_set(true)
   if ok then
     print(ok, err)
@@ -467,7 +468,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:tls_set('my.pem', '/home/user/pems', 'my.ca', 'my.key')
   if ok then
     print(ok, err)
@@ -495,7 +496,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:on_message(
     function(message_id, topic, payload, gos, retain)
       print('Recv. new message',
@@ -526,7 +527,7 @@ Lua API documentation
 
   * on_unsubscribe
 
-  See the detailed documentation of these functions in the [mqqt.init.lua](../mqqt/init.lua) file.
+  See the detailed documentation of these functions in the [mqtt.init.lua](mqtt/init.lua) file.
 
 [Back to content](#content)
 
@@ -540,10 +541,10 @@ TODO: describe me.
 ## Examples
 -----------
 
-  The [examples/connect.lua](../examples/connect.lua) file shows how to connect 
+  The [examples/connect.lua](examples/connect.lua) file shows how to connect 
   to an MQTT broker.
 
-  The [examples/producer_consumer_queue.lua](../examples/producer_consumer_queue.lua) file shows how 
+  The [examples/producer_consumer_queue.lua](examples/producer_consumer_queue.lua) file shows how 
   Tarantool produces, passes, and consumes data to and from an MQTT broker 
   via the MQTT connector in a non-blocking way.
 
@@ -557,7 +558,7 @@ TODO: describe me.
 
 ## See also
 ----------
-* [Tarantool](http://tarantool.org) homepage.
+* [Tarantool](https://www.tarantool.io) homepage.
 * MQTT brokers:
   * [Mosquitto](https://mosquitto.org) homepage.
   * [RabbitMQ](https://www.rabbitmq.com) homepage.
