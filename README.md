@@ -60,32 +60,6 @@ $ make -C build
 
 Lua API documentation.
 
-### lib_destroy
----------------
-
-  Cleanup everything.
-
-  Note: The module does not use the Lua's GC, the latter has to be called 
-  manually. To call it manually, first call `destroy` on each `mqtt` object.
-
-  Parameters:
-
-    None
-
-  Returns:
-
-    None
-
-  Example:
-
-```lua
-  mqtt = require('mqtt')
-  instance = mqtt.new("client_id", true)
-  mqtt.lib_destroy()
-```
-
-[Back to content](#content)
-
 ### new
 -------
 
@@ -102,7 +76,7 @@ Lua API documentation.
 
 Note that a client will never discard its own outgoing messages on disconnect. 
 Calling [connect](#connect) or [reconnect](#reconnect) will resend the messages.
-Use [reinitialise](#reinitialise) to reset the client to its original state.
+Use the `reinitialise` function to reset the client to its original state.
 
   Returns:
 
@@ -260,6 +234,32 @@ Use [reinitialise](#reinitialise) to reset the client to its original state.
   if ok then
     print(ok, err)
   end
+```
+
+[Back to content](#content)
+
+### lib_destroy
+---------------
+
+  Cleanup everything.
+
+  Note: The module does not use the Lua's GC, the latter has to be called 
+  manually. To call it manually, first call `destroy` on each `mqtt` object.
+
+  Parameters:
+
+    None
+
+  Returns:
+
+    None
+
+  Example:
+
+```lua
+  mqtt = require('mqtt')
+  instance = mqtt.new("client_id", true)
+  mqtt.lib_destroy()
 ```
 
 [Back to content](#content)
