@@ -58,7 +58,7 @@ $ make -C build
 ## API
 ------
 
-Lua API documentation
+Lua API documentation.
 
 ### lib_destroy
 ---------------
@@ -98,12 +98,11 @@ Lua API documentation
     clean_session   - Boolean. Set to true to instruct the broker to clean all 
                       messages and subscriptions on disconnect; false to instruct 
                       it to keep them. See the man page mqtt(7) for more details.
-                      Note that a client will never discard its own outgoing
-                      messages on disconnect. Calling (connect)[#connect] or
-                      (reconnect)[#reconnect] will resend the messages.
-                      Use [reinitialise](#reinitialise) to reset the client to its
-                      original state.
                       Must be set to true if the id parameter is NULL.
+
+Note that a client will never discard its own outgoing messages on disconnect. 
+Calling [connect](#connect) or [reconnect](#reconnect) will resend the messages.
+Use [reinitialise](#reinitialise) to reset the client to its original state.
 
   Returns:
 
@@ -200,7 +199,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err_or_mid = instance:subscribe('my/topic/#', 1)
   if ok then
     print(ok, err_or_mid)
@@ -227,7 +226,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:unsubscribe('my/topic/#')
   if ok then
     print(ok, err)
@@ -256,7 +255,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:destroy()
   if ok then
     print(ok, err)
@@ -290,7 +289,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:publish('my/topic/#', 'Some payload as string', mqtt.QOS_0, mqtt.RETAIN)
   if ok then
     print(ok, err)
@@ -322,7 +321,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:will_set('my/topic/#', 'Some payload as string', 0, true)
   if ok then
     print(ok, err)
@@ -346,7 +345,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:will_clear()
   if ok then
     print(ok, err)
@@ -380,7 +379,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:login_set('user', 'password')
   if ok then
     print(ok, err)
@@ -419,7 +418,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:tls_insecure_set(true)
   if ok then
     print(ok, err)
@@ -469,7 +468,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:tls_set('my.pem', '/home/user/pems', 'my.ca', 'my.key')
   if ok then
     print(ok, err)
@@ -497,7 +496,7 @@ Lua API documentation
 ```lua
   mqtt = require('mqtt')
   instance = mqtt.new("client_id", true)
-  -- Cut, see [connect](#connect)
+  -- Cut, see the connect function
   ok, err = instance:on_message(
     function(message_id, topic, payload, gos, retain)
       print('Recv. new message',
