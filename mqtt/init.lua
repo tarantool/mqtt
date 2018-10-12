@@ -48,8 +48,6 @@ local mqtt_mt
 --                   Note that a client will never discard its own outgoing
 --                   messages on disconnect. Calling <connect> or
 --                   <reconnect> will cause the messages to be resent.
---                   Use <reinitialise> to reset a client to its
---                   original state.
 --                   Must be set to true if the id parameter is NULL.
 --
 --  Returns:
