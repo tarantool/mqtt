@@ -123,6 +123,6 @@ assert(stat['channel/in_2_data_2'] ~= nil)
 print ("[+] Done")
 
 F('destroy', conn:destroy())
-F('destroy', conn:destroy())
+E('destroy', conn:destroy())
 
 os.exit(0)

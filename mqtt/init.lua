@@ -492,6 +492,9 @@ mqtt_mt = {
       if (self.fiber ~= nil and self.fiber.cancel ~= nil) then
         self.fiber:cancel()
       end
+      if next(getmetatable(self.mqtt)) == nil then
+        return false, "already destroyed"
+      end
       local ok, emsg = self.mqtt:destroy()
       self = nil
       return ok, emsg
