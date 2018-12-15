@@ -30,7 +30,7 @@ Key features:
   * [tls_insecure_set](#tls_insecure_set)
   * [tls_set](#tls_set)
   * [on_message](#on_message)
-  * [Subscribe on events](#Subscribe-on-events)
+  * [Subscribe on events](#subscribe-on-events)
 * [Performance tuning](#performance-tuning)
 * [Examples](#examples)
 * [Copyright & License](#copyright--license)
