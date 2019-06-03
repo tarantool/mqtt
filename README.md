@@ -39,18 +39,19 @@ Key features:
 ## Prerequisites
 -------------------------------
 
-  Before reading any further, make sure you have an MQTT broker installed.
+  Before reading any further, make sure you have an MQTT broker installed or use static build by passing **STATIC_BUILD** flags to cmake.
 
 ### Building from source
 
-Clone the repository with submodules, bootstrap, and build the client:
+Clone the repository with submodules and build the client:
 
 ```bash
 $ git clone https://github.com/tarantool/mqtt.git
 $ cd mqtt
 $ git submodule update --init --recursive
-$ ./bootstrap.sh
-$ make -C build
+$ mkdir build && cd build
+$ cmake ..
+$ make -j
 ```
 
 [Back to content](#content)
