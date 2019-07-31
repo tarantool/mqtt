@@ -7,6 +7,7 @@ option(WITH_STATIC_LIBRARIES "Build static versions of the libmosquitto/pp libra
 
 if( STATIC_BUILD )
 	set(WITH_STATIC_LIBRARIES ON)
+	set(WITH_PIC ON)
 	set(OPENSSL_USE_STATIC_LIBS ON)
 endif()
 
