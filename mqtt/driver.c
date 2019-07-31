@@ -547,7 +547,8 @@ mosq_subscribe_f(struct mosquitto *mosq __attribute__((unused)),
         return;
     lua_rawgeti(ctx->L, LUA_REGISTRYINDEX, ctx->subscribe_ref);
     lua_pushinteger(ctx->L, mid);
-    for (int i = 0; i < qos_count; i++)
+    int i = 0;
+    for (i = 0; i < qos_count; i++)
         lua_pushinteger(ctx->L, granted_qos[i]);
     if (lua_pcall(ctx->L, qos_count + 1, 0, 0) != LUA_OK)
         say_error("Subscribe callback failed: ref:%d, message: \"%s\"",
