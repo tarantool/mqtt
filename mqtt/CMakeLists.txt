@@ -19,7 +19,7 @@ endif()
 add_library(driver SHARED driver.c)
 
 if( DEFINED STATIC_BUILD )
-	unset(CMAKE_C_FLAGS)
+	set(CMAKE_C_FLAGS "-ldl -lpthread")
 	add_subdirectory(../third_party/mosquitto ../third_party/mosquitto/build)
 	include_directories(../third_party/mosquitto/lib)
 	if( STATIC_BUILD )
