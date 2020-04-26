@@ -20,6 +20,10 @@ add_library(driver SHARED driver.c)
 
 if( DEFINED STATIC_BUILD )
 	set(CMAKE_C_FLAGS "-ldl -lpthread")
+	if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+		# mosquitto wants to install binaries into /usr/local/sbin
+		set(CMAKE_INSTALL_SBINDIR ${CMAKE_INSTALL_BINDIR})
+	endif()
 	add_subdirectory(../third_party/mosquitto ../third_party/mosquitto/build)
 	include_directories(../third_party/mosquitto/lib)
 	if( STATIC_BUILD )
