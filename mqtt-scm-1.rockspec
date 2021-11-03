@@ -1,7 +1,7 @@
 package = "mqtt"
 version = "scm-1"
 source = {
-    url = "git://github.com/tarantool/mqtt.git",
+    url = "git+https://github.com/tarantool/mqtt.git",
     tag = "master"
 }
 description = {
