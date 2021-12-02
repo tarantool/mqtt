@@ -18,7 +18,7 @@ build = {
         CMAKE_BUILD_TYPE="RelWithDebInfo";
         TARANTOOL_INSTALL_LIBDIR="$(LIBDIR)";
         TARANTOOL_INSTALL_LUADIR="$(LUADIR)";
-        STATIC_BUILD="$(STATIC_BUILD)";
+        STATIC_BUILD="ON";
     };
     platforms = {
         macosx = {
